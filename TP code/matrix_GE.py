@@ -2,12 +2,6 @@ import math
 
 from matrix_utils import *
 
-def rowExchange(inputM, R1, R2):
-    temp = inputM[R2]
-    inputM[R2] = inputM[R1]
-    inputM[R1] = temp
-    return inputM
-
 def pivotIndex(inputM, row):
     count = 0
     for elem in inputM[row]:
@@ -107,9 +101,7 @@ def RREF(inputM):
                 break
         for col in range(cols):
             refM[row][col] /= pivot
-    
     return refM
-
 
 # function that calls GE with terminal interface
 def doGE():
@@ -143,13 +135,13 @@ def doGE():
 # print(GEWithSteps(M))
 # print(GE(M))
 
-M = \
-[[3, 2, 3, 4, 2, 2, 7, 2],
-[1, 2, 7, 6, 4, 5, 2, 3],
-[4, 2, 2, 3, 2, 4, 6, 1],
-[4, 5, 6, 2, 3, 1, 4, 0]]
-print(GEWithSteps(M))
-print(RREF(M))
+# M = \
+# [[3, 2, 3, 4, 2, 2, 7, 2],
+# [1, 2, 7, 6, 4, 5, 2, 3],
+# [4, 2, 2, 3, 2, 4, 6, 1],
+# [4, 5, 6, 2, 3, 1, 4, 0]]
+# print(GEWithSteps(M))
+# print(RREF(M))
 
 # # doGE()    # run this if you want to enter matrices dynamically
 
