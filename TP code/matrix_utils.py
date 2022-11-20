@@ -46,7 +46,7 @@ def matMul(M1, M2):
 def matMulWithSteps(M1, M2):
     pass
 
-# testing if matMul works
-M1 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]]
-M2 = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
-print(matMul(M1, M2))
+# # testing if matMul works
+# M1 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]]
+# M2 = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
+# print(matMul(M1, M2))

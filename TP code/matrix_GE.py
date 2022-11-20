@@ -126,10 +126,10 @@ def doGE():
 
 # test matrices below
 
-# M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]    # tricky, requires row exchange
-# print(GEWithSteps(M))
-# M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
-# print(GEWithSteps(M))
+M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]    # tricky, requires row exchange
+print(GEWithSteps(M))
+M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
+print(GEWithSteps(M))
 
 # M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
 # print(GEWithSteps(M))
