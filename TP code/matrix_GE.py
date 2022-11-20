@@ -1,7 +1,6 @@
 import math
 
-def create2dList(rows, cols):
-    return [([0]*cols) for row in range(rows)]
+from matrix_utils import *
 
 def rowExchange(inputM, R1, R2):
     temp = inputM[R2]
@@ -106,7 +105,7 @@ def doGE():
         print("Enter the number of columns")
         cols = int(input())
 
-    print("Enter your matrix in the format of a list")
+    print("***Enter the matrix entries below***")
     inputM = create2dList(rows, cols)
     for row in range(rows):
         for col in range(cols):
@@ -115,20 +114,21 @@ def doGE():
     
     print(f"Matrix in REF:\n{GE(inputM)}")
 
-M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]    # tricky, requires row exchange
-print(GEWithSteps(M))
-M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
-# print(rowExchange(M, 1, 0))
-print(GEWithSteps(M))
 
-M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
-print(GEWithSteps(M))
-print(GE(M))
+# test matrices below
 
-# doGE()
+# M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]    # tricky, requires row exchange
+# print(GEWithSteps(M))
+# M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
+# print(GEWithSteps(M))
+
+# M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
+# print(GEWithSteps(M))
+# print(GE(M))
+
+# # doGE()    # run this if you want to enter matrices dynamically
 
 '''
 Proposed improvements:
-- Row exchange for pivot values of 0
 - Display fractions instead of ints (detect fraction based on modulo of 1)
 '''
