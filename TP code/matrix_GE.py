@@ -106,7 +106,7 @@ def doGE():
         cols = int(input())
 
     print("***Enter the matrix entries below***")
-    inputM = create2dList(rows, cols)
+    inputM = create2DList(rows, cols)
     for row in range(rows):
         for col in range(cols):
             print(f"Enter the ({row}, {col}) entry")

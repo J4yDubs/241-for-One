@@ -6,40 +6,73 @@ from matrix_GE import *
 # takes in an augmented matrix (with last col being the constants)
 # Calls on matrix_GE for REF
 
+def isConsistent(refM):
+    rows, cols = len(refM), len(refM[0])
+    if refM[rows-1][cols-1] == 0:
+        return True
+    for col in range(cols-1):
+        if refM[rows-1][col] != 0:
+            return True
+    return False
+
 def SOLE(inputM):
     rows, cols = len(inputM), len(inputM[0])
     smallestDim = min(rows, cols)
-    x = [0]*(cols-1)
     refM = GE(inputM)
-    print(refM)
+    print(refM)     #*
+
+    # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
+    if not isConsistent(refM):
+        return f"Reduced system {refM} is inconsistent! \n{inputM} has no solutions!"
     
     ### Solving here ###
     # check if rows up to smallestDim has pivots
     # store pivot variable and free variable col indices as keys; coefficients
     # as values in dict
-    pivots, free = dict(), dict()
-    for col in range(smallestDim-1):
+    pivots, freeVars = [], []
+    for col in range(cols-1):
         if refM[col][col] != 0:
-            pivots[col] = refM[col][col]
-        else: free.add(col)
+            pivots.append(col)
+        else: freeVars.append(col)
+
+    print(pivots, freeVars) #*
     
-    # solving for matrices with no free variables,
-    if len(free) == 0:
+    # Case 2: Unique solution; no free variables (freeVars)
+    if len(freeVars) == 0:
+        x = [0]*(cols-1)
         x[cols-2]=refM[cols-2][cols-1]/refM[cols-2][cols-2]
         for col in range(cols-3,-1,-1):
             constant = refM[col][cols-1]
             for xCol in range(cols-2, col,-1):
                 constant -= x[xCol]*refM[col][xCol]
             x[col] = constant/refM[col][col]
-    # create equations automatically
-    # create variables that correspond to columns immediately
-        
+        return x
+    
+    # Case 3: Special solutions
+    x = create2DList(len(freeVars), cols-1)
+    for solNum in range(len(freeVars)):
+        for freeV in freeVars:
+            x[solNum][freeV] = 1    # setting one of the free variables to one
+            freeVars.remove(freeV)
+            break
+        xRow = x[solNum]
+        for pivotIndex in range(len(pivots)-1, -1, -1):
+            constant = refM[pivots[pivotIndex]][cols-1]
+            for xCol in range(cols-2, pivots[pivotIndex],-1):
+                constant -= xRow[xCol]*refM[pivots[pivotIndex]][xCol]
+            xRow[pivots[pivotIndex]] = constant/refM[pivots[pivotIndex]][pivots[pivotIndex]]
     return x
+
+            
+        
 
 # def SOLEWithSteps(inputM):
 
 ### Testing here ###
 M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]]
+print(SOLE(M))
+
+M = [[1, 2, 3, 0], [4, 5, 6, 0], [7, 8, 9, 0]]
 print(SOLE(M))
 # print(SOLEWithSteps(M))
 # M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
@@ -51,5 +84,6 @@ print(SOLE(M))
 
 '''
 Proposed Improvements:
-- Call on GE instead and then store row operations in there to apply to constant
+- Store row operations in there to apply to constant on right?
+- Detect is system is inconsistent (no solutions)
 '''
