@@ -17,7 +17,7 @@ def isConsistent(refM):
 
 def SOLE(inputM):
     rows, cols = len(inputM), len(inputM[0])
-    smallestDim = min(rows, cols)
+    smallestDim = min(rows, cols-1)
     refM = GE(inputM)
     print(refM)     #*
 
@@ -27,13 +27,14 @@ def SOLE(inputM):
     
     ### Solving here ###
     # check if rows up to smallestDim has pivots
-    # store pivot variable and free variable col indices as keys; coefficients
-    # as values in dict
+    # store pivot variable and free variable col indices
     pivots, freeVars = [], []
     for col in range(cols-1):
-        if refM[col][col] != 0:
-            pivots.append(col)
-        else: freeVars.append(col)
+        if col < rows and refM[col][col] != 0:
+                pivots.append(col)
+    for col in range(cols-1):
+        if col not in pivots:
+            freeVars.append(col)
 
     print(pivots, freeVars) #*
     
@@ -63,17 +64,30 @@ def SOLE(inputM):
             xRow[pivots[pivotIndex]] = constant/refM[pivots[pivotIndex]][pivots[pivotIndex]]
     return x
 
-            
-        
-
 # def SOLEWithSteps(inputM):
 
 ### Testing here ###
-M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]]
-print(SOLE(M))
 
-M = [[1, 2, 3, 0], [4, 5, 6, 0], [7, 8, 9, 0]]
-print(SOLE(M))
+# # unique solution
+# M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]]
+# print(SOLE(M))
+
+# # infinite solutions (dim(N(M)) = 1)
+# M = [[1, 2, 3, 0], [4, 5, 6, 0], [7, 8, 9, 0]]
+# print(SOLE(M))
+
+# # infinite solutions (dim(N(M)) = 3)
+# M = [[1, 2, 3, 4, 2, 2], [1, 3, 2, 6, 4, 7], [1, 2, 2, 3, 2, 4]]
+# print(SOLE(M))
+
+# # infinite solutions (dim(N(M)) = 
+# M = \
+# [[3, 2, 3, 4, 2, 2, 7, 2],
+# [1, 2, 7, 6, 4, 5, 2, 3],
+# [4, 2, 2, 3, 2, 4, 6, 1],
+# [4, 5, 6, 2, 3, 1, 4, 0]]
+# print(SOLE(M))
+
 # print(SOLEWithSteps(M))
 # M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
 # # print(rowExchange(M, 1, 0))

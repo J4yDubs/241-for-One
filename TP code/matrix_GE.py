@@ -94,6 +94,23 @@ def GEWithSteps(inputM):
             stepCount += 1
     return f"------------------\n***FINAL RESULT*** {inputM}\n------------------\n"
 
+def RREF(inputM):
+    refM = GE(inputM)
+    rows = len(inputM)
+    cols = len(inputM[0])
+    smallestDim = min(rows, cols)
+
+    for row in range(rows):
+        for col in range(cols):
+            if refM[row][col] != 0:
+                pivot = refM[row][col]
+                break
+        for col in range(cols):
+            refM[row][col] /= pivot
+    
+    return refM
+
+
 # function that calls GE with terminal interface
 def doGE():
     rows, cols = None, None
@@ -126,9 +143,18 @@ def doGE():
 # print(GEWithSteps(M))
 # print(GE(M))
 
+M = \
+[[3, 2, 3, 4, 2, 2, 7, 2],
+[1, 2, 7, 6, 4, 5, 2, 3],
+[4, 2, 2, 3, 2, 4, 6, 1],
+[4, 5, 6, 2, 3, 1, 4, 0]]
+print(GEWithSteps(M))
+print(RREF(M))
+
 # # doGE()    # run this if you want to enter matrices dynamically
 
 '''
 Proposed improvements:
 - Display fractions instead of ints (detect fraction based on modulo of 1)
+- If fractions not possible, then use rounding
 '''
