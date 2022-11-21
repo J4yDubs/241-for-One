@@ -19,7 +19,7 @@ def SOLE(inputM):
     rows, cols = len(inputM), len(inputM[0])
     smallestDim = min(rows, cols-1)
     refM = GE(inputM)
-    print(refM)     #*
+    # print(refM)     #*
 
     # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
     if not isConsistent(refM):
@@ -36,7 +36,7 @@ def SOLE(inputM):
         if col not in pivots:
             freeVars.append(col)
 
-    print(pivots, freeVars) #*
+    # print(pivots, freeVars) #*
     
     # Case 2: Unique solution; no free variables (freeVars)
     if len(freeVars) == 0:
@@ -87,6 +87,9 @@ def SOLE(inputM):
 # [4, 2, 2, 3, 2, 4, 6, 1],
 # [4, 5, 6, 2, 3, 1, 4, 0]]
 # print(SOLE(M))
+
+M = [[2, 3, -2, 6, 0], [0, 0, 3, -6, 0], [1, 0, 2, -3, 0]]
+print(SOLE(M))
 
 # print(SOLEWithSteps(M))
 # M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]

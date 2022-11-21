@@ -46,7 +46,21 @@ def matMul(M1, M2):
 def matMulWithSteps(M1, M2):
     pass
 
-# # testing if matMul works
+def matTpose(inputM):
+    rows = len(inputM)
+    cols =  len(inputM[0])
+    tposeM = create2DList(cols, rows)
+    for row in range(rows):
+        for col in range(cols):
+            tposeM[col][row] = inputM[row][col]
+    return tposeM
+
+
+# testing functions below
+
 # M1 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]]
 # M2 = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
 # print(matMul(M1, M2))
+
+# print(matTpose(M1))
+# print(matTpose(M2))
