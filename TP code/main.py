@@ -4,6 +4,44 @@ from matrix_SOLE import *
 
 from cmu_112_graphics import *
 
+# Classes below
+class Button:
+    def __init__(self, x0, y0, width, height, color, text, fontSize, fontStyle, bracketColor):
+        self.x0 = x0
+        self.y0 = y0
+        self.x1 = self.x0 + width
+        self.y1 = self.y0 + height
+        self.baseColor = color
+        self.color = self.baseColor
+        self.text = text
+        self.fontSize = fontSize
+        self.fontStyle = fontStyle
+        self.bracketColor = bracketColor
+
+    def mouseMoved(self, app, eventX, eventY):
+        if self.x0 <= eventX <= self.x1 and self.y0 <= eventY <= self.y1:
+            self.color = 'tan2'
+            self.fontStyle = 'bold'
+            self.bracketColor = self.color
+        else:
+            self.color = self.baseColor
+            self.fontStyle = ''
+            self.bracketColor = ''
+    
+    def redraw(self, app, canvas):
+        canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, fill=self.color, width=0)
+        canvas.create_text(mean(self.x0, self.x1), mean(self.y0, self.y1), text=self.text, fill='linen', 
+        font=f'Century {self.fontSize} {self.fontStyle}', justify=CENTER)
+
+class TextBox:
+    def __init__(self, name, color1, color2):
+        pass
+
+    def redraw(self, app, canvas):
+        pass
+
+# Helper functions below
+
 def mean(x,y):
     return (x+y)/2
 
@@ -16,14 +54,19 @@ def fitToScreen(app):
 
 def appStarted(app):
     fitToScreen(app)
-    # might need to make app.screens 2D list for sub modes
-    # app.screens = ['matAdd', 'matMul', 'GE', 'SOLE', 'LU', 'inverse', '4FS', 'det', 'home']
     app.screens = [ ['matCal', 'matAdd', 'matMul', 'matTpose'], 
     ['GE'], ['SOLE'], ['LU'], ['inverse'], ['4FS'], ['det'], ['GS'],
     ['home'] ]
     app.screen = app.screens[-1][0]
 
-    # ***Home Screen***
+    app.buttons = [[]]
+    # app.buttons.append(Button(300, 100)) # do in for loop
+    # then iterate through app.buttons in redrawall, mousepressed
+    # any button pressed = True if inside; else false; skip through body of code 
+    # can use default values
+    # if take in app as parameter, can directly modify app obj in button/textbox class
+
+    # *** HOME SCREEN ***
     # button locations
     app.homeMargin = app.width/8
     app.homeScrButtonWidth = (0.75*app.width-0.75*app.homeMargin)/4
@@ -41,25 +84,25 @@ def appStarted(app):
         ('Determinant', int(app.homeScrTitleSize/3)),
         ('Orthonormal\nBases', int(app.homeScrTitleSize/3)),
         ]
-    app.homeScrButtonAttrib = []
-    for i in range(8):  # number of buttons; separated by app.homeMargin/4
-        x0 = int( app.homeMargin + (i%4)*(app.homeScrButtonWidth + app.homeMargin/4) )
-        x1 = x0 + app.homeScrButtonWidth
-        y0 = 0.5*app.height + (i//4)*(app.homeMargin/4 + app.homeScrButtonHeight)
-        y1 = y0 + app.homeScrButtonHeight
-        # attributes format: x0, y0, x1, y1, font color, font style, button text, bracket color
-        app.homeScrButtonAttrib.append([x0, y0, x1, y1, 'tan4', '', app.homeButtonText[i], ''])
+    
+    # creating home buttons with button object
+    for i in range(8):
+        app.buttons[0].append(Button(int( app.homeMargin + (i%4)*(app.homeScrButtonWidth + app.homeMargin/4) ),
+                                0.5*app.height + (i//4)*(app.homeMargin/4 + app.homeScrButtonHeight),
+                                app.homeScrButtonWidth, app.homeScrButtonHeight,
+                                'tan4', app.homeButtonText[i][0], app.homeButtonText[i][1], '', ''))
 
-    # ***Back Home Button***
+    # *** BACK HOME BUTTON ***
     app.backHomeButtonMargin = 10
     app.backHomeButtonWidth = 0.1*app.width
     app.backHomeButtonHeight = 0.05*app.height
     app.backHomeButtonTextSize = int(app.height/70)
-    app.backHomeButtonAttrib = [app.backHomeButtonMargin, app.backHomeButtonMargin,
-     app.backHomeButtonMargin+app.backHomeButtonWidth, app.backHomeButtonMargin+app.backHomeButtonHeight,
-    'tan4', '', '241-for-Me', 'linen']
+    app.backHomeButton = Button(app.backHomeButtonMargin, app.backHomeButtonMargin, 
+                    app.backHomeButtonWidth, app.backHomeButtonHeight, 'tan4', 
+                    '241-for-Me', app.backHomeButtonTextSize, '', '')
 
-    # ***Addition Screen***
+    # *** MATRIX CALCULATOR SCREEN ***
+    app.matCalTitleSize = int(app.height/20)
 
 
 def getCellBounds(app, row, col):
@@ -77,88 +120,64 @@ def keyPressed(app, event):
     # For home screen
     pass
 
-def mousePressed(app, event):
-    # For home screen
-    if app.screen == 'home':
-        for i in range(len(app.homeScrButtonAttrib)):
-            if app.homeScrButtonAttrib[i][0] <= event.x <= app.homeScrButtonAttrib[i][2] and\
-                app.homeScrButtonAttrib[i][1] <= event.y <= app.homeScrButtonAttrib[i][3]:
-                app.screen = app.screens[i][0]
-    
-    elif app.screen != 'home':
-        if app.backHomeButtonAttrib[0] <= event.x <= app.backHomeButtonAttrib[2] and\
-                app.backHomeButtonAttrib[1] <= event.y <= app.backHomeButtonAttrib[3]:
-                app.screen = 'home'
-
 def mouseMoved(app, event):
     # For home screen
     if app.screen == 'home':
-        for i in range(len(app.homeScrButtonAttrib)):
-            if app.homeScrButtonAttrib[i][0] <= event.x <= app.homeScrButtonAttrib[i][2] and\
-                app.homeScrButtonAttrib[i][1] <= event.y <= app.homeScrButtonAttrib[i][3]:
-                app.homeScrButtonAttrib[i][4] = 'tan2'
-                app.homeScrButtonAttrib[i][5] = 'bold'
-                app.homeScrButtonAttrib[i][7] = 'tan2'
-            else: 
-                app.homeScrButtonAttrib[i][4] = 'tan4'
-                app.homeScrButtonAttrib[i][5] = ''
-                app.homeScrButtonAttrib[i][7] = ''
+        for i in range(len(app.buttons[0])):
+            app.buttons[0][i].mouseMoved(app, event.x, event.y)
 
     # for home button
     if app.screen != 'home':
-        if app.backHomeButtonAttrib[0] <= event.x <= app.backHomeButtonAttrib[2] and\
-                app.backHomeButtonAttrib[1] <= event.y <= app.backHomeButtonAttrib[3]:
-            app.backHomeButtonAttrib[4] = 'tan2'
-            app.backHomeButtonAttrib[7] = 'tan2'
-        else:
-            app.backHomeButtonAttrib[4] = 'tan4'
-            app.backHomeButtonAttrib[7] = ''
+        app.backHomeButton.mouseMoved(app, event.x, event.y)
+
+def mousePressed(app, event):
+    # For home screen
+    if app.screen == 'home':
+        for i in range(len(app.buttons[0])):
+            if app.buttons[0][i].x0 <= event.x <= app.buttons[0][i].x1 and\
+                app.buttons[0][i].y0 <= event.y <= app.buttons[0][i].y1:
+                app.screen = app.screens[i][0]
+    
+    elif app.screen != 'home':
+        if app.backHomeButton.x0 <= event.x <= app.backHomeButton.x1 and\
+                app.backHomeButton.y0 <= event.y <= app.backHomeButton.y1:
+                app.screen = 'home'
 
 def redrawHomeScreen(app, canvas):
     canvas.create_text(app.width/2, 0.13*app.height, text="241-for-One",
     fill='tan4', font=f'Century {app.homeScrTitleSize} bold', justify=CENTER)
     # canvas.create_text(app.width/2, 0.13*app.height, text="(           )",
     # fill='tan4', font=f'Century {app.homeScrTitleSize*2} bold')
-    canvas.create_text(app.width/2, mean(0.15*app.height, app.homeScrButtonAttrib[0][1]), 
+    canvas.create_text(app.width/2, mean(0.15*app.height, app.buttons[0][0].y0), 
     text='''
     <Insert app description here> 
     
     Now start by choosing one of the functions below!
     ''',
     fill='tan4', font=f'Century {int(app.homeScrTitleSize/3)}', justify=CENTER)
-    canvas.create_text(app.width/2, mean(app.homeScrButtonAttrib[0][1], app.homeScrButtonAttrib[4][3]), 
+    canvas.create_text(app.width/2, mean(app.buttons[0][0].y0, app.buttons[0][4].y1), 
     text="["+ " "*(int(app.homeScrTitleSize/5)) +"]", # makes this dynamically resize
     fill='tan4', font=f'Century {app.homeScrTitleSize*5}')
-    for i in range(len(app.homeScrButtonAttrib)):
-        canvas.create_rectangle(app.homeScrButtonAttrib[i][0], app.homeScrButtonAttrib[i][1],
-        app.homeScrButtonAttrib[i][2], app.homeScrButtonAttrib[i][3], width=0, fill=app.homeScrButtonAttrib[i][4])
-        canvas.create_text(mean(app.homeScrButtonAttrib[i][0], app.homeScrButtonAttrib[i][2]),
-        mean(app.homeScrButtonAttrib[i][1], app.homeScrButtonAttrib[i][3]), 
-        text=app.homeScrButtonAttrib[i][6][0],
-        fill='linen', font=f'Century {app.homeScrButtonAttrib[i][6][1]} {app.homeScrButtonAttrib[i][5]}', 
-        justify=CENTER)
-        canvas.create_text(mean(app.homeScrButtonAttrib[i][0], app.homeScrButtonAttrib[i][2]),
-        mean(app.homeScrButtonAttrib[i][1], app.homeScrButtonAttrib[i][3]), 
+
+    for i in range(len(app.buttons[0])):
+        app.buttons[0][i].redraw(app, canvas)
+        canvas.create_text(mean(app.buttons[0][i].x0, app.buttons[0][i].x1),
+        mean(app.buttons[0][i].y0, app.buttons[0][i].y1), 
         text="["+ " "*(int(app.homeScrButtonWidth/42)) +"]", # makes this dynamically resize
-        fill=app.homeScrButtonAttrib[i][7], font=f'Century {app.homeScrTitleSize*2}', 
+        fill=app.buttons[0][i].bracketColor, font=f'Century {app.homeScrTitleSize*2}', 
         justify=CENTER)
 
 def drawBackHomeButton(app, canvas):
-    canvas.create_rectangle(app.backHomeButtonAttrib[0], app.backHomeButtonAttrib[1],
-    app.backHomeButtonAttrib[2], app.backHomeButtonAttrib[3], width=0, fill=app.backHomeButtonAttrib[4])
-    canvas.create_text(mean(app.backHomeButtonAttrib[0], app.backHomeButtonAttrib[2]),
-    mean(app.backHomeButtonAttrib[1], app.backHomeButtonAttrib[3]),
-    text="241-for-One", fill='linen', font=f'Century {app.backHomeButtonTextSize} bold')
-    canvas.create_text(mean(app.backHomeButtonAttrib[0], app.backHomeButtonAttrib[2]),
-    mean(app.backHomeButtonAttrib[1], app.backHomeButtonAttrib[3]),
-    text="["+ " "*(int(app.backHomeButtonWidth/17)) +"]",
-    fill=app.backHomeButtonAttrib[7], 
-    font=f'Century {app.backHomeButtonTextSize*4}', 
-        justify=CENTER
-    )
+    app.backHomeButton.redraw(app, canvas)
+    canvas.create_text(mean(app.backHomeButton.x0, app.backHomeButton.x1), 
+    mean(app.backHomeButton.y0, app.backHomeButton.y1),
+    text="["+ " "*(int(app.backHomeButtonWidth/17)) +"]", fill=app.backHomeButton.bracketColor, 
+    font=f'Century {app.backHomeButton.fontSize*4}', justify=CENTER)
 
 def redrawMatCalScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    canvas.create_text(app.width/2, 0.08*app.height, text="Matrix Calculator",
+    fill='tan4', font=f'Century {app.matCalTitleSize} bold', justify=CENTER)
 
 def redrawMatAddScreen(app, canvas):
     drawBackHomeButton(app, canvas)

@@ -67,7 +67,7 @@ def GEWithSteps(inputM):
                 for pivotRow in range(col+1, rows): # searches for next non-zero pivot
                     if inputM[pivotRow][col] != 0:
                         rowExchange(inputM, col, pivotRow)
-                print(f"***Step {stepCount}*** R{col+1} ⇔ R {pivotRow+1}")
+                print(f"***Step {stepCount}*** \nR{col+1} ⇔  R{pivotRow+1}")
                 print(f"Intermediate output: {inputM}\n")
                 stepCount += 1
                 pivot = inputM[col][col]    # reassigns new pivot value
@@ -126,12 +126,12 @@ def doGE():
 
 # test matrices below
 
-# M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]    # tricky, requires row exchange
+# M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]    
 # print(GEWithSteps(M))
 # M = [[2, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
 # print(GEWithSteps(M))
 
-# M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
+# M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]] # tricky, requires row exchange
 # print(GEWithSteps(M))
 # # print(GE(M))
 
