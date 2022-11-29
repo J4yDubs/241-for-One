@@ -6,6 +6,13 @@ def mean(x,y):
 def create2DList(rows, cols):
     return [([0]*cols) for row in range(rows)]
 
+def roundOffEntries(M):
+    rows, cols = len(M), len(M[0])
+    for row in range(rows):
+        for col in range(cols):
+            M[row][col] = float("%.2f" % M[row][col])
+    return M
+
 def rowExchange(inputM, R1, R2):
     temp = inputM[R2]
     inputM[R2] = inputM[R1]
@@ -44,10 +51,38 @@ def matMul(M1, M2):
         for col in range(cols2):
             prodM[row][col] += matMulHelper(M1, M2, row, col)
     
-    return prodM
+    return roundOffEntries(prodM)
+
+def matMulWithStepsHelper(M1, M2, row, col):
+    cols = len(M1[0])
+    entry = 0
+    products = []
+    for k in range(cols):
+        entry += M1[row][k] * M2[k][col]
+        products.append((M1[row][k], M2[k][col]))
+    return (entry, products)
 
 def matMulWithSteps(M1, M2):
-    pass
+    rows1, cols1 = len(M1), len(M1[0])
+    rows2, cols2 = len(M2), len(M2[0])
+    if cols1 != rows2:
+        return "Matrix dimension mismatch!"
+    
+    stepCount = 1
+    
+    prodM = create2DList(rows1, cols2)
+    for row in range(rows1):
+        for col in range(cols2):
+            productStr = ''
+            prodM[row][col] += matMulWithStepsHelper(M1, M2, row, col)[0]
+            products = matMulWithStepsHelper(M1, M2, row, col)[1]
+            for product in products:
+                productStr += str("%.2f" % product[0])+'×'+str("%.2f" % product[1])+'+'
+            print(f'***Step {stepCount}*** \n({row}, {col}) entry = {productStr[:-1]}')
+            print(f'({row}, {col}) entry = {prodM[row][col]}')
+            stepCount += 1
+    
+    return roundOffEntries(prodM)
 
 def matTpose(inputM):
     rows = len(inputM)
@@ -64,6 +99,7 @@ def matTpose(inputM):
 # M1 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]]
 # M2 = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
 # print(matMul(M1, M2))
+# print(matMulWithSteps(M1, M2))
 
 # print(matTpose(M1))
 # print(matTpose(M2))

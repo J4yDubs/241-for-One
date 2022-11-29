@@ -88,7 +88,7 @@ class TextBox:
 class DimTextBox(TextBox):
     def __init__(self, x0, y0, width, height, color, outline, fontSize, app):
         super().__init__(x0, y0, width, height, color, outline, fontSize, app)
-        self.text = '3'
+        self.text = '3'     # pre-set dimension
 
 class MatrixEntry():
     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
@@ -163,6 +163,16 @@ class MatrixEntry():
                 if self.text[i][j] == '':
                     return False
         return True
+    
+    def matrix(self):
+        M = create2DList(self.rows, self.cols)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.text[i][j] == '':
+                    M[i][j] = 0
+                else:
+                    M[i][j] = float(self.text[i][j])
+        return M
 
     def clear(self):
         for i in range(self.rows):
@@ -183,7 +193,7 @@ class OutputMatrix:
         self.text = [(['']*self.cols) for row in range(self.rows)]
         for i in range(self.rows):
             for j in range(self.cols):
-                self.text[i][j] = str(matrix[i][j])
+                self.text[i][j] = str("%.2f" % matrix[i][j])
         self.isSelected = [([None]*self.cols) for row in range(self.rows)]
     
     def mouseMoved(self, app, eventX, eventY):
@@ -252,7 +262,7 @@ def appStarted(app):
 
     # app.textBoxes indices:
     # 0: add, 1: mult, 2: tpose
-    app.textBoxes = [[[]],[],[]]
+    app.textBoxes = [[[]],[[],[]],[]]
 
     # *** HOME SCREEN ***
     # button locations
@@ -300,6 +310,28 @@ def appStarted(app):
                     app.backButtonWidth, app.backButtonHeight, 'tan4', 
                     'Back', app.backButtonsTextSize, '', '')
 
+    # *** SOLVE BUTTON ***
+    app.solveButtonMargin = app.width/3
+    app.solveButtonWidth = (0.75*app.width-0.2*app.solveButtonMargin)/6
+    app.solveButtonHeight = 0.4*app.solveButtonWidth
+    app.solveButtonTextSize = int(app.height/50)
+    app.solveButton = Button(app.solveButtonMargin, 0.8*app.height,
+                                app.solveButtonWidth, app.solveButtonHeight,
+                                'tan4', 'Solve', app.solveButtonTextSize, '', '')
+
+    # *** CLEAR ENTRIES BUTTON ***
+    app.clearButtonMargin = app.width/3
+    app.clearButtonWidth = (0.75*app.width-0.2*app.clearButtonMargin)/6
+    app.clearButtonHeight = 0.4*app.clearButtonWidth
+    app.clearButtonTextSize = int(app.height/50)
+    app.clearButtonSep = (app.width-2*app.clearButtonMargin-2*app.clearButtonWidth)
+    app.clearButton = Button(app.solveButtonMargin + app.solveButtonWidth + app.clearButtonSep,
+                                 0.8*app.height,
+                                app.clearButtonWidth, app.clearButtonHeight,
+                                'tan4', 'Clear', app.clearButtonTextSize, '', '')
+
+    # *** SHOW STEPS BUTTON ***
+
     # *** MATRIX CALCULATOR SCREEN ***
     # button locations
     app.calMargin = app.width/7
@@ -315,33 +347,19 @@ def appStarted(app):
         ('Obtain\nTranspose', int(app.calScrTitleSize/2.5)), 
         ]
     # creating buttons with button object
-    for i in range(3):
+    for i in range(len(app.calButtonsText)):
         app.buttons[1].append(Button(int( app.calMargin + i*(app.calScrButtonWidth + app.calScrButtonSep) ),
                                 0.5*app.height,
                                 app.calScrButtonWidth, app.calScrButtonHeight,
                                 'tan4', app.calButtonsText[i][0], app.calButtonsText[i][1], '', ''))
 
     # *** MATRIX ADDITION SCREEN *** (no showing steps)
-    # buttons
+    # text box margins
     app.matAddMargin = app.width/3
-    app.addScrButtonWidth = (0.75*app.width-0.2*app.matAddMargin)/6
-    app.addScrButtonHeight = 0.4*app.addScrButtonWidth
-    app.addScrButtonSep = (app.width-2*app.matAddMargin-2*app.addScrButtonWidth)
     # font sizes
     app.addScrTitleSize = int(app.height/20)
-    # button text
-    app.addButtonsText = [
-        ('Solve', int(app.addScrTitleSize/2.5)), 
-        ('Clear entries', int(app.addScrTitleSize/2.5)),
-        ]
-    # creating buttons with button object
-    for i in range(2):
-        app.buttons[2].append(Button(int( app.matAddMargin + i*(app.addScrButtonWidth + app.addScrButtonSep) ),
-                                0.8*app.height,
-                                app.addScrButtonWidth, app.addScrButtonHeight,
-                                'tan4', app.addButtonsText[i][0], app.addButtonsText[i][1], '', ''))
     # Dimension text boxes 
-    # app.addScrDimTB - addition Screen Dimension Text Box
+    # app.addScrDimTB prefix - addition Screen Dimension Text Box
     app.addScrDimTBWidth = 0.05*app.width
     app.addScrDimTBHeight = app.addScrDimTBWidth
     app.addScrDimTBSep = (app.width-2*app.matAddMargin-2*app.addScrDimTBWidth)
@@ -350,7 +368,6 @@ def appStarted(app):
          0.13*app.height, 
          app.addScrDimTBWidth, app.addScrDimTBHeight, 
          'peach puff', 'tan4', app.addScrDimTBHeight/2, app))
-
     # matrix entry text boxes
     app.addScrEntryTBX0 = app.width/9
     app.addScrEntryTBY0 = 0.27*app.height
@@ -376,32 +393,76 @@ def appStarted(app):
     app.addResultX1, app.addResultY1, 'peach puff', 'tan4', app.addScrEntryFontSize, app)
 
     # *** MATRIX MULTIPLICATION SCREEN ***
+    # text box margin
+    app.matMulMargin = app.width/3
+    # font sizes
+    app.mulScrTitleSize = int(app.height/20)
+    # Text Box Dims
+    # i) dimension text boxes
+    app.mulScrDimTBWidth = 0.05*app.width
+    app.mulScrDimTBHeight = app.mulScrDimTBWidth
+    app.mulScrDimTBSep = (app.width/2-1*app.matMulMargin-2*app.mulScrDimTBWidth)
+    for i in range(2):
+        app.textBoxes[1][0].append(DimTextBox(int( app.matMulMargin/2 + i*(app.mulScrDimTBWidth + app.mulScrDimTBSep) ),
+         0.13*app.height, 
+         app.mulScrDimTBWidth, app.mulScrDimTBHeight, 
+         'peach puff', 'tan4', app.mulScrDimTBHeight/2, app))
+        
+        app.textBoxes[1][1].append(DimTextBox(int( app.matMulMargin/2 + app.width/2 + i*(app.mulScrDimTBWidth + app.mulScrDimTBSep) ),
+         0.13*app.height, 
+         app.mulScrDimTBWidth, app.mulScrDimTBHeight, 
+         'peach puff', 'tan4', app.mulScrDimTBHeight/2, app))
+    # ii) entry text boxes
+    app.mulScrEntryTBX0 = app.width/9
+    app.mulScrEntryTBY0 = 0.27*app.height
+    app.mulScrEntryTBX1 = app.width/2-app.mulScrEntryTBX0
+    app.mulScrEntryTBY1 = app.mulScrEntryTBY0 + (app.mulScrEntryTBX1 - app.mulScrEntryTBX0) # square
+    app.mulScrEntryTBWidth = app.mulScrEntryTBX1 - app.mulScrEntryTBX0
+    app.mulScrEntryTBHeight = app.mulScrEntryTBY1 - app.mulScrEntryTBY0
+    app.mulScrEntryTB1Rows = int(app.textBoxes[1][0][0].text)
+    app.mulScrEntryTB1Cols = int(app.textBoxes[1][0][1].text)
+    app.mulScrEntryTB2Rows = int(app.textBoxes[1][1][0].text)
+    app.mulScrEntryTB2Cols = int(app.textBoxes[1][1][1].text)
+    app.mulScrEntry1FontSize = min((app.mulScrEntryTBHeight)/(2*app.mulScrEntryTB1Rows),
+    (app.mulScrEntryTBWidth)/(2*app.mulScrEntryTB1Cols))
+    app.mulScrEntry2FontSize = min((app.mulScrEntryTBHeight)/(2*app.mulScrEntryTB2Rows),
+    (app.mulScrEntryTBWidth)/(2*app.mulScrEntryTB2Cols))
+    # Entry Text Box 1 (app.textBoxes[1][2])
+    app.textBoxes[1].append(MatrixEntry( app.mulScrEntryTB1Rows, app.mulScrEntryTB1Cols, 
+    app.mulScrEntryTBX0, app.mulScrEntryTBY0, app.mulScrEntryTBX1, app.mulScrEntryTBY1, 
+    'peach puff', 'tan4', app.mulScrEntry1FontSize, app))
+    # Entry Text Box 2 (app.textBoxes[1][3])
+    for i in range(2):
+        app.textBoxes[1].append(MatrixEntry( app.mulScrEntryTB2Rows, app.mulScrEntryTB2Cols, 
+        app.mulScrEntryTBX0 + app.width/2, app.mulScrEntryTBY0, 
+        app.mulScrEntryTBX1 + app.width/2, app.mulScrEntryTBY1, 
+        'peach puff', 'tan4', app.mulScrEntry2FontSize, app))
+
+    # *** MULTIPLICATION RESULT SCREEN ***
+    app.mulResultX0 = app.width/3
+    app.mulResultY0 = app.height/5
+    app.mulResultX1 = app.width - app.mulResultX0
+    app.mulResultY1 = app.mulResultY0 + (app.mulResultX1 - app.mulResultX0)
+    app.mulResultMatrix = create2DList(app.mulScrEntryTB1Rows, app.mulScrEntryTB2Cols)
+    app.mulResult = OutputMatrix(app.mulResultMatrix, app.mulResultX0, app.mulResultY0, 
+    app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
+    min(app.mulScrEntry1FontSize,app.mulScrEntry2FontSize), app)
 
     # *** MATRIX TRANSPOSE SCREEN *** (no showing steps)
 
-
-def getCellBounds(app, row, col):
-    colWidth = (app.width-2*app.margin) / app.cols
-    rowHeight = (app.height-2*app.margin) / app.rows
-    x0 = app.margin + col * colWidth
-    x1 = app.margin + (col+1)* colWidth
-    y0 = app.margin + row * rowHeight
-    y1 = app.margin + (row+1) * rowHeight
-    return (x0, y0, x1, y1)
-
 def keyPressed(app, event):
+    # *** MATRIX ADDITION SCREEN ***
     if app.screen == 'matAdd':
         for i in range(len(app.textBoxes[0][0])):
             if app.textBoxes[0][0][i].keyPressed(app, event.key):
-                for i in range(1, len(app.textBoxes[0])):
-                    if app.textBoxes[0][0][0].text != '':
-                        app.addScrEntryTBRows = int(app.textBoxes[0][0][0].text)
-                        app.addScrEntryFontSize = min((app.addScrEntryTBY1-app.addScrEntryTBY0)/(2*app.addScrEntryTBRows),
-                        (app.addScrEntryTBX1-app.addScrEntryTBX0)/(2*app.addScrEntryTBCols))
-                    if app.textBoxes[0][0][1].text != '':
-                        app.addScrEntryTBCols = int(app.textBoxes[0][0][1].text)
-                        app.addScrEntryFontSize = min((app.addScrEntryTBY1-app.addScrEntryTBY0)/(2*app.addScrEntryTBRows),
-                        (app.addScrEntryTBX1-app.addScrEntryTBX0)/(2*app.addScrEntryTBCols))
+                if app.textBoxes[0][0][0].text != '':
+                    app.addScrEntryTBRows = int(app.textBoxes[0][0][0].text)
+                    app.addScrEntryFontSize = min((app.addScrEntryTBY1-app.addScrEntryTBY0)/(2*app.addScrEntryTBRows),
+                    (app.addScrEntryTBX1-app.addScrEntryTBX0)/(2*app.addScrEntryTBCols))
+                if app.textBoxes[0][0][1].text != '':
+                    app.addScrEntryTBCols = int(app.textBoxes[0][0][1].text)
+                    app.addScrEntryFontSize = min((app.addScrEntryTBY1-app.addScrEntryTBY0)/(2*app.addScrEntryTBRows),
+                    (app.addScrEntryTBX1-app.addScrEntryTBX0)/(2*app.addScrEntryTBCols))
                 app.textBoxes[0][1] = MatrixEntry( app.addScrEntryTBRows, app.addScrEntryTBCols, 
                     app.addScrEntryTBX0, app.addScrEntryTBY0, 
                     app.addScrEntryTBX1, app.addScrEntryTBY1, 
@@ -413,10 +474,40 @@ def keyPressed(app, event):
                 app.addResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)
         for i in range(1, len(app.textBoxes[0])):
             app.textBoxes[0][i].keyPressed(app, event.key)
+    
+    elif app.screen == 'matMul':
+        for i in range(len(app.textBoxes[1][0])):
+            if app.textBoxes[1][0][i].keyPressed(app, event.key):
+                if app.textBoxes[1][0][0].text != '':
+                    app.mulScrEntryTB1Rows = int(app.textBoxes[1][0][0].text)
+                    app.mulScrEntry1FontSize = min((app.mulScrEntryTBHeight)/(2*app.mulScrEntryTB1Rows),
+                    (app.mulScrEntryTBWidth)/(2*app.mulScrEntryTB1Cols))
+                if app.textBoxes[1][0][1].text != '':
+                    app.mulScrEntryTB1Cols = int(app.textBoxes[1][0][1].text)
+                    app.mulScrEntry1FontSize = min((app.mulScrEntryTBHeight)/(2*app.mulScrEntryTB1Rows),
+                    (app.mulScrEntryTBWidth)/(2*app.mulScrEntryTB1Cols))
+                app.textBoxes[1][2] = MatrixEntry( app.mulScrEntryTB1Rows, app.mulScrEntryTB1Cols, 
+                    app.mulScrEntryTBX0, app.mulScrEntryTBY0, 
+                    app.mulScrEntryTBX1, app.mulScrEntryTBY1, 
+                    'peach puff', 'tan4', app.mulScrEntry1FontSize, app)
+        for i in range(len(app.textBoxes[1][1])):
+            if app.textBoxes[1][1][i].keyPressed(app, event.key):
+                if app.textBoxes[1][1][0].text != '':
+                    app.mulScrEntryTB2Rows = int(app.textBoxes[1][1][0].text)
+                    app.mulScrEntry2FontSize = min((app.mulScrEntryTBHeight)/(2*app.mulScrEntryTB2Rows),
+                    (app.mulScrEntryTBWidth)/(2*app.mulScrEntryTB2Cols))
+                if app.textBoxes[1][1][1].text != '':
+                    app.mulScrEntryTB2Cols = int(app.textBoxes[1][1][1].text)
+                    app.mulScrEntry2FontSize = min((app.mulScrEntryTBHeight)/(2*app.mulScrEntryTB2Rows),
+                    (app.mulScrEntryTBWidth)/(2*app.mulScrEntryTB2Cols))
+                app.textBoxes[1][3] = MatrixEntry( app.mulScrEntryTB2Rows, app.mulScrEntryTB2Cols, 
+                    app.mulScrEntryTBX0 + app.width/2, app.mulScrEntryTBY0, 
+                    app.mulScrEntryTBX1 + app.width/2, app.mulScrEntryTBY1, 
+                    'peach puff', 'tan4', app.mulScrEntry2FontSize, app)
+                # app.mulResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)
+        for i in range(2, len(app.textBoxes[1])):
+            app.textBoxes[1][i].keyPressed(app, event.key)
     # create dictionary of keybindings
-
-    # For home screen
-    pass
 
 def mouseMoved(app, event):
     # For home screen
@@ -434,15 +525,24 @@ def mouseMoved(app, event):
                 app.buttons[1][i].mouseMoved(app, event.x, event.y)
         
         elif app.screen == 'matAdd':
-            for i in range(len(app.buttons[2])):
-                app.buttons[2][i].mouseMoved(app, event.x, event.y)
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
 
             for i in range(len(app.textBoxes[0][0])):
                 app.textBoxes[0][0][i].mouseMoved(app, event.x, event.y)
             app.textBoxes[0][1].mouseMoved(app, event.x, event.y)
             app.textBoxes[0][2].mouseMoved(app, event.x, event.y)
-    
+        
+        elif app.screen == 'matMul':
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
 
+            for i in range(len(app.textBoxes[1][0])):
+                app.textBoxes[1][0][i].mouseMoved(app, event.x, event.y)
+            for i in range(len(app.textBoxes[1][1])):
+                app.textBoxes[1][1][i].mouseMoved(app, event.x, event.y)
+            app.textBoxes[1][2].mouseMoved(app, event.x, event.y)
+            app.textBoxes[1][3].mouseMoved(app, event.x, event.y)
 
 def mousePressed(app, event):
     # For home screen
@@ -459,6 +559,7 @@ def mousePressed(app, event):
                 if app.buttons[1][i].mousePressed(app, event.x, event.y):
                     app.screen = app.screens[0][i+1][0]
         
+        # For Matrix Addition and its sub-screens
         elif app.screen == 'matAdd':
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'matCal'
@@ -466,7 +567,9 @@ def mousePressed(app, event):
                 app.textBoxes[0][0][i].mousePressed(app, event.x, event.y)
             app.textBoxes[0][1].mousePressed(app, event.x, event.y)
             app.textBoxes[0][2].mousePressed(app, event.x, event.y)
-            if app.buttons[2][0].mousePressed(app, event.x, event.y) and \
+
+            # Solving here
+            if app.solveButton.mousePressed(app, event.x, event.y) and \
                 app.textBoxes[0][1].isFilled() and app.textBoxes[0][2].isFilled():
                 app.addResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)  # clears result list
                 for i in range(app.addScrEntryTBRows):
@@ -475,19 +578,47 @@ def mousePressed(app, event):
                 app.addResult = OutputMatrix(app.addResultMatrix, app.addResultX0, app.addResultY0, 
                         app.addResultX1, app.addResultY1, 'peach puff', 'tan4', app.addScrEntryFontSize, app)
                 app.screen = 'matAddResult'
-            if app.buttons[2][1].mousePressed(app, event.x, event.y):
+            
+            # Clearing here
+            if app.clearButton.mousePressed(app, event.x, event.y):
                 app.textBoxes[0][1].clear()
                 app.textBoxes[0][2].clear()
-        
+
         elif app.screen == 'matAddResult':
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'matAdd'
         
+        # For Matrix Multiplication and its sub-screens
         elif app.screen == 'matMul':
-            if app.backButton.x0 <= event.x <= app.backButton.x1 and\
-                app.backButton.y0 <= event.y <= app.backButton.y1:
+            if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'matCal'
+            for i in range(len(app.textBoxes[1][0])):
+                app.textBoxes[1][0][i].mousePressed(app, event.x, event.y)
+                app.textBoxes[1][1][i].mousePressed(app, event.x, event.y)
+            app.textBoxes[1][2].mousePressed(app, event.x, event.y)
+            app.textBoxes[1][3].mousePressed(app, event.x, event.y)
+
+            # Solving here (MULT)
+            if app.solveButton.mousePressed(app, event.x, event.y) \
+                and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
+                and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
+                M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
+                app.mulResultMatrix = matMul(M1,M2)
+                app.mulResult = OutputMatrix(app.mulResultMatrix, app.mulResultX0, app.mulResultY0, 
+                app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
+                min(app.mulScrEntry1FontSize,app.mulScrEntry2FontSize)/2, app)
+                app.screen = 'matMulResult'
+
+            # Clearing here
+            if app.clearButton.mousePressed(app, event.x, event.y):
+                app.textBoxes[1][2].clear()
+                app.textBoxes[1][3].clear()
+
+        elif app.screen == 'matMulResult':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'matMul'
         
+        # For Tranpose and its sub-screens
         elif app.screen == 'matTpose':
             if app.backButton.x0 <= event.x <= app.backButton.x1 and\
                 app.backButton.y0 <= event.y <= app.backButton.y1:
@@ -521,6 +652,7 @@ def redrawHomeScreen(app, canvas):
         fill=app.buttons[0][i].bracketColor, font=f'Century {app.homeScrTitleSize*2}', 
         justify=CENTER)
 
+# ***** BUTTON REDRAW FUNCTIONS *****
 def drawBackHomeButton(app, canvas):
     app.backHomeButton.redraw(app, canvas)
     canvas.create_text(mean(app.backHomeButton.x0, app.backHomeButton.x1), 
@@ -535,6 +667,13 @@ def drawBackButton(app, canvas):
     text="["+ " "*(int(app.backButtonWidth/17)) +"]", fill=app.backButton.bracketColor, 
     font=f'Century {app.backButton.fontSize*4}', justify=CENTER)
 
+def drawSolveButton(app, canvas):
+    app.solveButton.redraw(app, canvas)
+
+def drawClearButton(app, canvas):
+    app.clearButton.redraw(app, canvas)
+
+# ***** SCREEN REDRAW FUNCTIONS *****
 def redrawMatCalScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     canvas.create_text(app.width/2, 0.25*app.height, text="General Matrix\nCalculator",
@@ -549,8 +688,8 @@ def redrawMatAddScreen(app, canvas):
     canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Addition",
     fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
 
-    for i in range(len(app.buttons[2])):
-        app.buttons[2][i].redraw(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
     
     for i in range(len(app.textBoxes[0][0])):
         app.textBoxes[0][0][i].redraw(app, canvas)
@@ -574,10 +713,31 @@ def redrawMatAddResultScreen(app, canvas):
 def redrawMatMulScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Multiplication",
+    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
+
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
+
+    for i in range(len(app.textBoxes[0][0])):
+        app.textBoxes[1][0][i].redraw(app, canvas)
+        app.textBoxes[1][1][i].redraw(app, canvas)
+    
+    app.textBoxes[1][2].redraw(app, canvas)
+    app.textBoxes[1][3].redraw(app, canvas)
+
+def redrawMatMulResultScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height, text="Matrix Multiplication\nResult:",
+    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
+    app.mulResult.redraw(app, canvas)
 
 def redrawMatTposeScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.05*app.height, text="Obtain Transpose",
+    fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
 
 def redrawGEScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -611,8 +771,10 @@ def redrawAll(app, canvas):
         redrawMatAddScreen(app, canvas)
     elif app.screen == 'matAddResult':
         redrawMatAddResultScreen(app, canvas)
-    elif app.screen =='matMul':
+    elif app.screen == 'matMul':
         redrawMatMulScreen(app, canvas)
+    elif app.screen == 'matMulResult':
+        redrawMatMulResultScreen(app, canvas)
     elif app.screen == 'matTpose':
         redrawMatTposeScreen(app, canvas)
     elif app.screen == 'GE':
