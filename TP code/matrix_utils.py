@@ -1,5 +1,8 @@
 import math
 
+def mean(x,y):
+    return (x+y)/2
+
 def create2DList(rows, cols):
     return [([0]*cols) for row in range(rows)]
 
