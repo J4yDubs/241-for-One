@@ -1,7 +1,6 @@
 from matrix_utils import *
 from matrix_GE import *
 from matrix_SOLE import *
-
 from cmu_112_graphics import *
 from animation_classes import *
 from animation_helpers import *

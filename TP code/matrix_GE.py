@@ -38,7 +38,8 @@ def GE(inputM):
                         rowExchange(inputM, col, pivotRow)
                 pivot = inputM[col][col]    # reassigns new pivot value
             
-            pivotRatio = inputM[row][col]/pivot
+            entryElim = inputM[row][col]
+            pivotRatio = entryElim/pivot
             for colElim in range(col, cols):
                 if pivotRatio > 0:  # if both have the same sign
                     inputM[row][colElim] =\
@@ -83,7 +84,8 @@ def GEWithSteps(inputM):
                         stepCount += 1
                 pivot = inputM[col][col]    # reassigns new pivot value
 
-            pivotRatio = inputM[row][col]/pivot
+            entryElim = inputM[row][col]
+            pivotRatio = entryElim/pivot
             for colElim in range(col, cols):
                 if pivotRatio > 0:  # if both have the same sign
                     inputM[row][colElim] =\
@@ -91,10 +93,11 @@ def GEWithSteps(inputM):
                 else:    # if both have different signs
                     inputM[row][colElim] =\
                     inputM[row][colElim] + abs(pivotRatio)*inputM[col][colElim]
+            # print(inputM[row][col])
             if pivotRatio > 0:
-                steps.append(f'Step {stepCount}:\nR{row+1} → R{row+1} - ({inputM[row][col]}÷{pivot})×R{col+1}\n{matToStr(roundOffEntries(inputM))}')
+                steps.append(f'Step {stepCount}:\nR{row+1} → R{row+1} - ({entryElim}÷{pivot})×R{col+1}\n{matToStr(roundOffEntries(inputM))}')
             else:     
-                steps.append(f'Step {stepCount}:\nR{row+1} → R{row+1} + ({abs(inputM[row][col])}÷{abs(pivot)})×R{col+1}\n{matToStr(roundOffEntries(inputM))}')
+                steps.append(f'Step {stepCount}:\nR{row+1} → R{row+1} + ({abs(entryElim)}÷{abs(pivot)})×R{col+1}\n{matToStr(roundOffEntries(inputM))}')
             # print(steps[-1])
             stepCount += 1
     steps.append(f'REF Matrix:\n{matToStr(roundOffEntries(inputM))}')

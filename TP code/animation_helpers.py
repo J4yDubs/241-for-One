@@ -456,10 +456,10 @@ def matAddMousePressed(app, event):
                 app.addResultX1, app.addResultY1, 'peach puff', 'tan4', app.addScrEntryFontSize/2, app)
         app.screen = 'matAddResult'
     
-        # Clearing here
-        if app.clearButton.mousePressed(app, event.x, event.y):
-            app.textBoxes[0][1].clear()
-            app.textBoxes[0][2].clear()
+    # Clearing here
+    if app.clearButton.mousePressed(app, event.x, event.y):
+        app.textBoxes[0][1].clear()
+        app.textBoxes[0][2].clear()
 
 # Matrix multiplication mousePressed
 def matMulMousePressed(app, event):
