@@ -29,6 +29,14 @@ def fitToScreen(app):
 # ********************* KEYPRESSED FUNCTIONS **********************
 # *****************************************************************
 
+# scroll keypressed
+def scrollKeyPressed(app, event):
+    if event.key in app.scrollKeys:
+            if app.scrollY > 0:
+                if app.scrollKeys[event.key] < 0:
+                    app.scrollY += app.scrollKeys[event.key]
+            else: app.scrollY += app.scrollKeys[event.key]
+
 # *****************************************************************
 # ********************* MOUSEMOVED FUNCTIONS **********************
 # *****************************************************************

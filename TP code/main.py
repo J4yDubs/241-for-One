@@ -372,12 +372,7 @@ def keyPressed(app, event):
         app.textBoxes[2][1].keyPressed(app, event.key)
         
     if app.screen == 'matMulSteps' or '':   # extend to other steps screens
-        if event.key in app.scrollKeys:
-            if app.scrollY > 0:
-                if app.scrollKeys[event.key] < 0:
-                    app.scrollY += app.scrollKeys[event.key]
-            else: app.scrollY += app.scrollKeys[event.key]
-    # create dictionary of keybindings
+        scrollKeyPressed(app, event)
 
 def mouseMoved(app, event):
     # For home screen
@@ -478,11 +473,11 @@ def mousePressed(app, event):
             app.textBoxes[1][3].mousePressed(app, event.x, event.y)
 
             # Solving here (MULT)
-            if app.solveButton.mousePressed(app, event.x, event.y) \
-                and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
-                and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
-                M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
-                # M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
+            if app.solveButton.mousePressed(app, event.x, event.y):
+                # and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
+                # and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
+                # M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
+                M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
                 app.mulResultMatrix, app.mulSteps = matMulWithSteps(M1, M2)
                 app.mulResult = OutputMatrix(app.mulResultMatrix, app.mulResultX0, app.mulResultY0, 
                 app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
@@ -654,8 +649,6 @@ def redrawMatMulResultScreen(app, canvas):
 def redrawMatMulStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
-    drawSolveButton(app, canvas)
-    drawClearButton(app, canvas)
     canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="Matrix Multiplication\nResult:",
     fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
 
@@ -701,7 +694,7 @@ def redrawGEStepsScreen(app, canvas):
 def redrawSOLEScreen(app, canvas):
     drawBackHomeButton(app, canvas)
 
-def redrawSOLEResultsScreen(app, canvas):
+def redrawSOLEResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
 
 def redrawSOLEStepsScreen(app, canvas):
@@ -726,15 +719,27 @@ def redrawGSScreen(app, canvas):
 def redrawAll(app, canvas):
     canvas.create_rectangle(0, 0, app.width, app.height, width=0, fill='linen')
     if app.screen == 'home': redrawHomeScreen(app, canvas)
+
     elif app.screen == 'matCal': redrawMatCalScreen(app,canvas)
+
     elif app.screen == 'matAdd': redrawMatAddScreen(app, canvas)
     elif app.screen == 'matAddResult': redrawMatAddResultScreen(app, canvas)
+
     elif app.screen == 'matMul': redrawMatMulScreen(app, canvas)
     elif app.screen == 'matMulResult': redrawMatMulResultScreen(app, canvas)
     elif app.screen == 'matMulSteps': redrawMatMulStepsScreen(app, canvas)
+
     elif app.screen == 'matTpose': redrawMatTposeScreen(app, canvas)
     elif app.screen == 'matTposeResult': redrawMatTposeResultScreen(app, canvas)
+    
     elif app.screen == 'GE': redrawGEScreen(app, canvas)
+    elif app.screen == 'GEResult': redrawGEResultScreen(app, canvas)
+    elif app.screen == 'GESteps': redrawGEStepsScreen(app, canvas)
+
+    elif app.screen == 'SOLE': redrawSOLEScreen(app, canvas)
+    elif app.screen == 'SOLEResult': redrawSOLEResultScreen(app, canvas)
+    elif app.screen == 'SOLESteps': redrawSOLEStepsScreen(app, canvas)
+
     elif app.screen == 'SOLE': redrawSOLEScreen(app, canvas)
     elif app.screen == 'LU': redrawLUScreen(app, canvas)
     elif app.screen == 'inverse': redrawInverseScreen(app, canvas)
