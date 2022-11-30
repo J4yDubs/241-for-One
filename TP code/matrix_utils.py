@@ -30,9 +30,6 @@ def matAdd(M1, M2):
             sum[row][col] = M1[row][col] + M2[row][col]
     return sum
 
-def matAddWithSteps(M1, M2):
-    pass
-
 def matMulHelper(M1, M2, row, col):
     cols = len(M1[0])
     entry = 0
@@ -71,18 +68,19 @@ def matMulWithSteps(M1, M2):
     stepCount = 1
     
     prodM = create2DList(rows1, cols2)
+    steps = []
     for row in range(rows1):
         for col in range(cols2):
             productStr = ''
             prodM[row][col] += matMulWithStepsHelper(M1, M2, row, col)[0]
             products = matMulWithStepsHelper(M1, M2, row, col)[1]
             for product in products:
-                productStr += str("%.2f" % product[0])+'×'+str("%.2f" % product[1])+'+'
-            print(f'***Step {stepCount}*** \n({row}, {col}) entry = {productStr[:-1]}')
-            print(f'({row}, {col}) entry = {prodM[row][col]}')
+                productStr += str("%.2f" % product[0])+'×'+str("%.2f" % product[1])+' + '
+            steps.append(f'Step {stepCount}:\n({row}, {col}) entry = {productStr[:-2]}\n= {prodM[row][col]}')
+            # print(steps[-1])
             stepCount += 1
     
-    return roundOffEntries(prodM)
+    return roundOffEntries(prodM), steps
 
 def matTpose(inputM):
     rows = len(inputM)

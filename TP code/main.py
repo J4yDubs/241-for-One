@@ -3,266 +3,33 @@ from matrix_GE import *
 from matrix_SOLE import *
 
 from cmu_112_graphics import *
-
-# Classes below
-class Button:
-    def __init__(self, x0, y0, width, height, color, text, fontSize, fontStyle, bracketColor):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = self.x0 + width
-        self.y1 = self.y0 + height
-        self.baseColor = color
-        self.color = self.baseColor
-        self.text = text
-        self.fontSize = fontSize
-        self.fontStyle = fontStyle
-        self.bracketColor = bracketColor
-
-    def mouseMoved(self, app, eventX, eventY):
-        if self.x0 <= eventX <= self.x1 and self.y0 <= eventY <= self.y1:
-            self.color = 'tan2'
-            self.fontStyle = 'bold'
-            self.bracketColor = self.color
-        else:
-            self.color = self.baseColor
-            self.fontStyle = ''
-            self.bracketColor = ''
-    
-    def mousePressed(self, app, eventX, eventY):
-        if self.x0 <= eventX <= self.x1 and self.y0 <= eventY <= self.y1:
-            return True
-    
-    def redraw(self, app, canvas):
-        canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, fill=self.color, width=0)
-        canvas.create_text(mean(self.x0, self.x1), mean(self.y0, self.y1), text=self.text, fill='linen', 
-        font=f'Century {self.fontSize} {self.fontStyle}', justify=CENTER)
-
-class TextBox:
-    def __init__(self, x0, y0, width, height, color, outline, fontSize, app):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = self.x0 + width
-        self.y1 = self.y0 + height
-        self.baseColor = color
-        self.color = self.baseColor
-        self.outline = outline
-        self.fontSize = fontSize
-        self.text = ''
-        self.isSelected = None
-
-    def mouseMoved(self, app, eventX, eventY):
-        if self.x0 <= eventX <= self.x1 and self.y0 <= eventY <= self.y1 and not self.isSelected:
-            self.color = 'navajo white'
-        else:
-            if self.isSelected:
-                self.color = 'tan1'
-            else:
-                self.color = self.baseColor
-
-    def mousePressed(self, app, eventX, eventY):
-        if self.x0 <= eventX <= self.x1 and self.y0 <= eventY <= self.y1:
-            self.color = 'tan1'
-            self.isSelected = True
-        else:
-            self.color = self.baseColor
-            self.isSelected = False
-
-    def keyPressed(self, app, eventKey):
-        # checks if length if eventKey is 1
-        if self.isSelected:
-            if eventKey in app.numKeys:
-                self.text += eventKey
-                return True
-            elif eventKey == 'Backspace' or eventKey == 'Delete':
-                self.text = self.text[:-1]
-                return True
-
-    def redraw(self, app, canvas):
-        canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, fill=self.color, outline=self.outline)
-        if self.isSelected:
-            canvas.create_text(mean(self.x0, self.x1), mean(self.y0, self.y1), text=self.text, fill='linen', 
-            font=f'Century {int(self.fontSize)}', justify=CENTER)
-        else: canvas.create_text(mean(self.x0, self.x1), mean(self.y0, self.y1), text=self.text, fill=f'{self.outline}', 
-            font=f'Century {int(self.fontSize)}', justify=CENTER)
-
-class DimTextBox(TextBox):
-    def __init__(self, x0, y0, width, height, color, outline, fontSize, app):
-        super().__init__(x0, y0, width, height, color, outline, fontSize, app)
-        self.text = '3'     # pre-set dimension
-
-class MatrixEntry():
-    def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
-        self.rows, self.cols = rows, cols
-        self.x0, self.y0, self.x1, self.y1 = x0, y0, x1, y1
-        self.width = (x1 - x0)/cols
-        self.height = (y1 - y0)/rows
-        self.baseColor = color
-        self.color = [([self.baseColor]*self.cols) for row in range(self.rows)]
-        self.outline = outline
-        self.fontSize = fontSize
-        self.text = [(['']*self.cols) for row in range(self.rows)]
-        self.isSelected = [([None]*self.cols) for row in range(self.rows)]
-
-    def mouseMoved(self, app, eventX, eventY):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                entryX0 = self.x0 + j*self.width
-                entryX1 = entryX0 + self.width
-                entryY0 = self.y0 + i*self.height
-                entryY1 = entryY0 + self.height
-                if entryX0 <= eventX <= entryX1 and entryY0 <= eventY <= entryY1 and not self.isSelected[i][j]:
-                    self.color[i][j] = 'navajo white'
-                else:
-                    if self.isSelected[i][j]:
-                        self.color[i][j] = 'tan1'
-                    else:
-                        self.color[i][j] = self.baseColor
-
-    def mousePressed(self, app, eventX, eventY):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                entryX0 = self.x0 + j*self.width
-                entryX1 = entryX0 + self.width
-                entryY0 = self.y0 + i*self.height
-                entryY1 = entryY0 + self.height
-                if entryX0 <= eventX <= entryX1 and entryY0 <= eventY <= entryY1:
-                    self.color[i][j] = 'tan1'
-                    self.isSelected[i][j] = True
-                else:
-                    self.color[i][j] = self.baseColor
-                    self.isSelected[i][j] = False
-
-    def keyPressed(self, app, eventKey):
-        # checks if length if eventKey is 1
-        for i in range(self.rows):
-            for j in range(self.cols):
-                if self.isSelected[i][j]:
-                    if eventKey in app.numKeys:
-                        self.text[i][j] += eventKey
-                    elif eventKey == 'Backspace' or eventKey == 'Delete':
-                        self.text[i][j] = self.text[i][j][:-1]
-
-    def redraw(self, app, canvas):
-        if self.rows and self.cols > 0:
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    entryX0 = self.x0 + j*self.width
-                    entryX1 = entryX0 + self.width
-                    entryY0 = self.y0 + i*self.height
-                    entryY1 = entryY0 + self.height
-                    canvas.create_rectangle(entryX0, entryY0, entryX1, entryY1, fill=self.color[i][j], outline=self.outline)
-                    if self.isSelected[i][j]:
-                        canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill='linen', 
-                        font=f'Century {int(self.fontSize)}', justify=CENTER)
-                    else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
-                        font=f'Century {int(self.fontSize)}', justify=CENTER)
-    
-    def isFilled(self):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                if self.text[i][j] == '':
-                    return False
-        return True
-    
-    def matrix(self):
-        M = create2DList(self.rows, self.cols)
-        for i in range(self.rows):
-            for j in range(self.cols):
-                if self.text[i][j] == '':
-                    M[i][j] = 0
-                else:
-                    M[i][j] = float(self.text[i][j])
-        return M
-
-    def clear(self):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                self.text[i][j] = ''
-
-class OutputMatrix:
-    def __init__(self, matrix, x0, y0, x1, y1, color, outline, fontSize, app):
-        self.matrix = matrix    # input list
-        self.x0, self.y0, self.x1, self.y1 = x0, y0, x1, y1
-        self.rows, self.cols = len(matrix), len(matrix[0])
-        self.width = (x1 - x0)/self.cols
-        self.height = (y1 - y0)/self.rows
-        self.baseColor = color
-        self.color = [([self.baseColor]*self.cols) for row in range(self.rows)]
-        self.outline = outline
-        self.fontSize = fontSize
-        self.text = [(['']*self.cols) for row in range(self.rows)]
-        for i in range(self.rows):
-            for j in range(self.cols):
-                self.text[i][j] = str("%.2f" % matrix[i][j])
-        self.isSelected = [([None]*self.cols) for row in range(self.rows)]
-    
-    def mouseMoved(self, app, eventX, eventY):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                entryX0 = self.x0 + j*self.width
-                entryX1 = entryX0 + self.width
-                entryY0 = self.y0 + i*self.height
-                entryY1 = entryY0 + self.height
-                if entryX0 <= eventX <= entryX1 and entryY0 <= eventY <= entryY1 and not self.isSelected[i][j]:
-                    self.color[i][j] = 'navajo white'
-                else:
-                    if self.isSelected[i][j]:
-                        self.color[i][j] = 'tan1'
-                    else:
-                        self.color[i][j] = self.baseColor
-    
-    def redraw(self, app, canvas):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                entryX0 = self.x0 + j*self.width
-                entryX1 = entryX0 + self.width
-                entryY0 = self.y0 + i*self.height
-                entryY1 = entryY0 + self.height
-                canvas.create_rectangle(entryX0, entryY0, entryX1, entryY1, fill=self.color[i][j], outline=self.outline)
-                if self.isSelected[i][j]:
-                    canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill='linen', 
-                    font=f'Century {int(self.fontSize)}', justify=CENTER)
-                else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
-                    font=f'Century {int(self.fontSize)}', justify=CENTER)
-
-
-
-# class MatrixTextBox(TextBox):
-#     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, fontStyle, app):
-#         super().__init__(x0, y0, color, outline, fontSize, fontStyle, app)
-#         self.rows = rows
-#         self.cols = cols
-
-# do a child class dim textbox that restricts entry size
-
-
-# *****************************************************************
-# ********************** ANIMATION FUNCTIONS **********************
-# *****************************************************************
-
-# Taken from Piazza by instructor Joe Ritze (to get screen dimensions to get fullscreen)
-def fitToScreen(app):
-	app.width = app._theRoot.winfo_screenwidth()
-	app.height = app._theRoot.winfo_screenheight()
-	app.setSize(app.width, app.height)
-	app.updateTitle()
+from animation_classes import *
+from animation_helpers import *
 
 def appStarted(app):
     fitToScreen(app)
-    app.screens = [ ['matCal', ['matAdd', 'matAddResult'],
-     ['matMul', 'matMulResult', 'matMulShowSteps'], 
+    app.screens = [ ['matCal',
+     ['matAdd', 'matAddResult'],
+     ['matMul', 'matMulResult', 'matMulSteps'], 
      ['matTpose', 'matTposeResult']], 
-    ['GE'], ['SOLE'], ['LU'], ['inverse'], ['4FS'], ['det'], ['GS'],
+    ['GE', 'GEResult', 'GESteps'], 
+    ['SOLE', 'SOLEResult', 'SOLESteps'], 
+    ['LU'], ['inverse'], ['4FS'], ['det'], ['GS'],
     ['home'] ]
     app.screen = app.screens[-1][0]
+
+    # scrolling
+    app.scrollY = 0
+    app.scrollKeys = {'Up': 5, 'Down': -5}
 
     # app.buttons indices:
     # 0: home, 1: calc, 2: add, 3: mult, 4: tpose
     app.buttons = [[],[],[],[],[],[],[]]
 
     # app.textBoxes indices:
-    # 0: add, 1: mult, 2: tpose
-    app.textBoxes = [[[]],[[],[]],[]]
+    # 0: add, 1: mult, 2: tpose, 3: GE
+    # innermost list stores dimension Text Boxes
+    app.textBoxes = [[[]], [[],[]], [[]], [[]]]
 
     # *** HOME SCREEN ***
     # button locations
@@ -284,7 +51,7 @@ def appStarted(app):
         ]
     # creating home buttons with button object
     for i in range(8):
-        app.buttons[0].append(Button(int( app.homeMargin + (i%4)*(app.homeScrButtonWidth + app.homeMargin/4) ),
+        app.buttons[0].append(button(int( app.homeMargin + (i%4)*(app.homeScrButtonWidth + app.homeMargin/4) ),
                                 0.5*app.height + (i//4)*(app.homeMargin/4 + app.homeScrButtonHeight),
                                 app.homeScrButtonWidth, app.homeScrButtonHeight,
                                 'tan4', app.homeButtonsText[i][0], app.homeButtonsText[i][1], '', ''))
@@ -297,7 +64,7 @@ def appStarted(app):
     app.backHomeButtonWidth = 0.1*app.width
     app.backHomeButtonHeight = 0.05*app.height
     app.backHomeButtonsTextSize = int(app.height/70)
-    app.backHomeButton = Button(app.backHomeButtonMargin, app.backHomeButtonMargin, 
+    app.backHomeButton = button(app.backHomeButtonMargin, app.backHomeButtonMargin, 
                     app.backHomeButtonWidth, app.backHomeButtonHeight, 'tan4', 
                     '241-for-One', app.backHomeButtonsTextSize, '', '')
 
@@ -306,7 +73,7 @@ def appStarted(app):
     app.backButtonWidth = 0.1*app.width
     app.backButtonHeight = 0.05*app.height
     app.backButtonsTextSize = int(app.height/70)
-    app.backButton = Button(2*app.backButtonMargin + app.backHomeButtonWidth, app.backButtonMargin, 
+    app.backButton = button(2*app.backButtonMargin + app.backHomeButtonWidth, app.backButtonMargin, 
                     app.backButtonWidth, app.backButtonHeight, 'tan4', 
                     'Back', app.backButtonsTextSize, '', '')
 
@@ -315,7 +82,7 @@ def appStarted(app):
     app.solveButtonWidth = (0.75*app.width-0.2*app.solveButtonMargin)/6
     app.solveButtonHeight = 0.4*app.solveButtonWidth
     app.solveButtonTextSize = int(app.height/50)
-    app.solveButton = Button(app.solveButtonMargin, 0.8*app.height,
+    app.solveButton = button(app.solveButtonMargin, 0.8*app.height,
                                 app.solveButtonWidth, app.solveButtonHeight,
                                 'tan4', 'Solve', app.solveButtonTextSize, '', '')
 
@@ -325,12 +92,18 @@ def appStarted(app):
     app.clearButtonHeight = 0.4*app.clearButtonWidth
     app.clearButtonTextSize = int(app.height/50)
     app.clearButtonSep = (app.width-2*app.clearButtonMargin-2*app.clearButtonWidth)
-    app.clearButton = Button(app.solveButtonMargin + app.solveButtonWidth + app.clearButtonSep,
+    app.clearButton = button(app.solveButtonMargin + app.solveButtonWidth + app.clearButtonSep,
                                  0.8*app.height,
                                 app.clearButtonWidth, app.clearButtonHeight,
                                 'tan4', 'Clear', app.clearButtonTextSize, '', '')
 
     # *** SHOW STEPS BUTTON ***
+    app.stepsButtonWidth = app.width/10
+    app.stepsButtonHeight = 0.4*app.stepsButtonWidth
+    app.stepsButtonTextSize = int(app.height/50)
+    app.stepsButton = button(app.width/2 - app.stepsButtonWidth/2, 0.8*app.height,
+                                app.stepsButtonWidth, app.stepsButtonHeight,
+                                'tan4', 'Show steps', app.stepsButtonTextSize, '', '')
 
     # *** MATRIX CALCULATOR SCREEN ***
     # button locations
@@ -348,7 +121,7 @@ def appStarted(app):
         ]
     # creating buttons with button object
     for i in range(len(app.calButtonsText)):
-        app.buttons[1].append(Button(int( app.calMargin + i*(app.calScrButtonWidth + app.calScrButtonSep) ),
+        app.buttons[1].append(button(int( app.calMargin + i*(app.calScrButtonWidth + app.calScrButtonSep) ),
                                 0.5*app.height,
                                 app.calScrButtonWidth, app.calScrButtonHeight,
                                 'tan4', app.calButtonsText[i][0], app.calButtonsText[i][1], '', ''))
@@ -358,17 +131,18 @@ def appStarted(app):
     app.matAddMargin = app.width/3
     # font sizes
     app.addScrTitleSize = int(app.height/20)
-    # Dimension text boxes 
+    # Text Box Dims
+    # i) dimension text boxes 
     # app.addScrDimTB prefix - addition Screen Dimension Text Box
     app.addScrDimTBWidth = 0.05*app.width
     app.addScrDimTBHeight = app.addScrDimTBWidth
     app.addScrDimTBSep = (app.width-2*app.matAddMargin-2*app.addScrDimTBWidth)
     for i in range(2):
         app.textBoxes[0][0].append(DimTextBox(int( app.matAddMargin + i*(app.addScrDimTBWidth + app.addScrDimTBSep) ),
-         0.13*app.height, 
+         0.11*app.height, 
          app.addScrDimTBWidth, app.addScrDimTBHeight, 
          'peach puff', 'tan4', app.addScrDimTBHeight/2, app))
-    # matrix entry text boxes
+    # ii) entry text boxes
     app.addScrEntryTBX0 = app.width/9
     app.addScrEntryTBY0 = 0.27*app.height
     app.addScrEntryTBX1 = app.width/2-app.addScrEntryTBX0
@@ -404,12 +178,11 @@ def appStarted(app):
     app.mulScrDimTBSep = (app.width/2-1*app.matMulMargin-2*app.mulScrDimTBWidth)
     for i in range(2):
         app.textBoxes[1][0].append(DimTextBox(int( app.matMulMargin/2 + i*(app.mulScrDimTBWidth + app.mulScrDimTBSep) ),
-         0.13*app.height, 
+         0.11*app.height, 
          app.mulScrDimTBWidth, app.mulScrDimTBHeight, 
          'peach puff', 'tan4', app.mulScrDimTBHeight/2, app))
-        
         app.textBoxes[1][1].append(DimTextBox(int( app.matMulMargin/2 + app.width/2 + i*(app.mulScrDimTBWidth + app.mulScrDimTBSep) ),
-         0.13*app.height, 
+         0.11*app.height, 
          app.mulScrDimTBWidth, app.mulScrDimTBHeight, 
          'peach puff', 'tan4', app.mulScrDimTBHeight/2, app))
     # ii) entry text boxes
@@ -448,7 +221,79 @@ def appStarted(app):
     app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
     min(app.mulScrEntry1FontSize,app.mulScrEntry2FontSize), app)
 
+    # *** MULTIPLICATION STEPS SCREEN ***
+    app.mulSteps = []
+
     # *** MATRIX TRANSPOSE SCREEN *** (no showing steps)
+    # text box margins
+    app.tposeMargin = app.width/2.5
+    # font sizes
+    app.tposeScrTitleSize = int(app.height/20)
+    # Text Box Dims
+    # i) dimension text boxes
+    app.tposeScrDimTBWidth = 0.05*app.width
+    app.tposeScrDimTBHeight = app.tposeScrDimTBWidth
+    app.tposeScrDimTBSep = (app.width-2*app.tposeMargin-2*app.tposeScrDimTBWidth)
+    for i in range(2):
+        app.textBoxes[2][0].append(DimTextBox(int( app.tposeMargin + i*(app.tposeScrDimTBWidth + app.tposeScrDimTBSep) ),
+         0.11*app.height, 
+         app.tposeScrDimTBWidth, app.tposeScrDimTBHeight, 
+         'peach puff', 'tan4', app.tposeScrDimTBHeight/2, app))
+    # ii) entry text boxes
+    app.tposeScrEntryTBX0 = app.width/10
+    app.tposeScrEntryTBY0 = 0.27*app.height
+    app.tposeScrEntryTBX1 = app.width/2-app.tposeScrEntryTBX0
+    app.tposeScrEntryTBY1 = app.tposeScrEntryTBY0 + (app.tposeScrEntryTBX1 - app.tposeScrEntryTBX0) # square
+    app.tposeScrEntryTBWidth = app.tposeScrEntryTBX1 - app.tposeScrEntryTBX0
+    app.tposeScrEntryTBHeight = app.tposeScrEntryTBY1 - app.tposeScrEntryTBY0
+    app.tposeScrEntryTBRows = int(app.textBoxes[2][0][0].text)
+    app.tposeScrEntryTBCols = int(app.textBoxes[2][0][1].text)
+    app.tposeScrEntryFontSize = min((app.tposeScrEntryTBHeight)/(2*app.tposeScrEntryTBRows),
+    (app.tposeScrEntryTBWidth)/(2*app.tposeScrEntryTBCols))
+    app.textBoxes[2].append(MatrixEntry( app.tposeScrEntryTBRows, app.tposeScrEntryTBCols, 
+    app.width/2 - app.tposeScrEntryTBWidth/2, app.tposeScrEntryTBY0, 
+    app.width/2 + app.tposeScrEntryTBWidth/2, app.tposeScrEntryTBY1, 
+    'peach puff', 'tan4', app.tposeScrEntryFontSize, app))
+
+    # *** TRANSPOSE RESULT SCREEN ***
+    app.tposeResultX0 = app.width/3
+    app.tposeResultY0 = app.height/5
+    app.tposeResultX1 = app.width - app.tposeResultX0
+    app.tposeResultY1 = app.tposeResultY0 + (app.tposeResultX1 - app.tposeResultX0)
+    app.tposeResultMatrix = create2DList(app.tposeScrEntryTBRows, app.tposeScrEntryTBCols)
+    app.tposeResult = OutputMatrix(app.tposeResultMatrix, app.tposeResultX0, app.tposeResultY0, 
+    app.tposeResultX1, app.tposeResultY1, 'peach puff', 'tan4', app.tposeScrEntryFontSize, app)
+
+    # *** GE SCREEN ***
+    # text box margins
+    app.GEMargin = app.width/2.5
+    # font sizes
+    app.GEScrTitleSize = int(app.height/20)
+    # Text Box Dims
+    # i) dimension text boxes
+    app.GEScrDimTBWidth = 0.05*app.width
+    app.GEScrDimTBHeight = app.GEScrDimTBWidth
+    app.GEScrDimTBSep = (app.width-2*app.GEMargin-2*app.GEScrDimTBWidth)
+    for i in range(2):
+        app.textBoxes[3][0].append(DimTextBox(int( app.GEMargin + i*(app.GEScrDimTBWidth + app.GEScrDimTBSep) ),
+         0.11*app.height, 
+         app.GEScrDimTBWidth, app.GEScrDimTBHeight, 
+         'peach puff', 'tan4', app.GEScrDimTBHeight/2, app))
+    # ii) entry text boxes
+    app.GEScrEntryTBX0 = app.width/10
+    app.GEScrEntryTBY0 = 0.27*app.height
+    app.GEScrEntryTBX1 = app.width/2-app.GEScrEntryTBX0
+    app.GEScrEntryTBY1 = app.GEScrEntryTBY0 + (app.GEScrEntryTBX1 - app.GEScrEntryTBX0) # square
+    app.GEScrEntryTBWidth = app.GEScrEntryTBX1 - app.GEScrEntryTBX0
+    app.GEScrEntryTBHeight = app.GEScrEntryTBY1 - app.GEScrEntryTBY0
+    app.GEScrEntryTBRows = int(app.textBoxes[3][0][0].text)
+    app.GEScrEntryTBCols = int(app.textBoxes[3][0][1].text)
+    app.GEScrEntryFontSize = min((app.GEScrEntryTBHeight)/(2*app.GEScrEntryTBRows),
+    (app.GEScrEntryTBWidth)/(2*app.GEScrEntryTBCols))
+    app.textBoxes[2].append(MatrixEntry( app.GEScrEntryTBRows, app.GEScrEntryTBCols, 
+    app.width/2 - app.GEScrEntryTBWidth/2, app.GEScrEntryTBY0, 
+    app.width/2 + app.GEScrEntryTBWidth/2, app.GEScrEntryTBY1, 
+    'peach puff', 'tan4', app.GEScrEntryFontSize, app))
 
 def keyPressed(app, event):
     # *** MATRIX ADDITION SCREEN ***
@@ -507,6 +352,31 @@ def keyPressed(app, event):
                 # app.mulResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)
         for i in range(2, len(app.textBoxes[1])):
             app.textBoxes[1][i].keyPressed(app, event.key)
+    
+    elif app.screen == 'matTpose':
+        for i in range(len(app.textBoxes[2][0])):
+            if app.textBoxes[2][0][i].keyPressed(app, event.key):
+                if app.textBoxes[2][0][0].text != '':
+                    app.tposeScrEntryTBRows = int(app.textBoxes[2][0][0].text)
+                    app.tposeScrEntryFontSize = min((app.tposeScrEntryTBHeight)/(2*app.tposeScrEntryTBRows),
+                    (app.tposeScrEntryTBWidth)/(2*app.tposeScrEntryTBCols))
+                if app.textBoxes[2][0][1].text != '':
+                    app.tposeScrEntryTBCols = int(app.textBoxes[2][0][1].text)
+                    app.tposeScrEntryFontSize = min((app.tposeScrEntryTBHeight)/(2*app.tposeScrEntryTBRows),
+                    (app.tposeScrEntryTBWidth)/(2*app.tposeScrEntryTBCols))
+                app.textBoxes[2][1] = MatrixEntry( app.tposeScrEntryTBRows, app.tposeScrEntryTBCols, 
+                        app.width/2 - app.tposeScrEntryTBWidth/2, app.tposeScrEntryTBY0, 
+                        app.width/2 + app.tposeScrEntryTBWidth/2, app.tposeScrEntryTBY1, 
+                        'peach puff', 'tan4', app.tposeScrEntryFontSize, app)
+                app.tposeResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)
+        app.textBoxes[2][1].keyPressed(app, event.key)
+        
+    if app.screen == 'matMulSteps' or '':   # extend to other steps screens
+        if event.key in app.scrollKeys:
+            if app.scrollY > 0:
+                if app.scrollKeys[event.key] < 0:
+                    app.scrollY += app.scrollKeys[event.key]
+            else: app.scrollY += app.scrollKeys[event.key]
     # create dictionary of keybindings
 
 def mouseMoved(app, event):
@@ -527,7 +397,6 @@ def mouseMoved(app, event):
         elif app.screen == 'matAdd':
             app.solveButton.mouseMoved(app, event.x, event.y)
             app.clearButton.mouseMoved(app, event.x, event.y)
-
             for i in range(len(app.textBoxes[0][0])):
                 app.textBoxes[0][0][i].mouseMoved(app, event.x, event.y)
             app.textBoxes[0][1].mouseMoved(app, event.x, event.y)
@@ -536,13 +405,23 @@ def mouseMoved(app, event):
         elif app.screen == 'matMul':
             app.solveButton.mouseMoved(app, event.x, event.y)
             app.clearButton.mouseMoved(app, event.x, event.y)
-
             for i in range(len(app.textBoxes[1][0])):
                 app.textBoxes[1][0][i].mouseMoved(app, event.x, event.y)
             for i in range(len(app.textBoxes[1][1])):
                 app.textBoxes[1][1][i].mouseMoved(app, event.x, event.y)
             app.textBoxes[1][2].mouseMoved(app, event.x, event.y)
             app.textBoxes[1][3].mouseMoved(app, event.x, event.y)
+        
+        elif app.screen == 'matMulResult':
+            app.stepsButton.mouseMoved(app, event.x, event.y)
+        
+        elif app.screen == 'matTpose':
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
+            for i in range(len(app.textBoxes[2][0])):
+                app.textBoxes[2][0][i].mouseMoved(app, event.x, event.y)
+            app.textBoxes[2][1].mouseMoved(app, event.x, event.y)
+
 
 def mousePressed(app, event):
     # For home screen
@@ -603,7 +482,8 @@ def mousePressed(app, event):
                 and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
                 and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
                 M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
-                app.mulResultMatrix = matMul(M1,M2)
+                # M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
+                app.mulResultMatrix, app.mulSteps = matMulWithSteps(M1, M2)
                 app.mulResult = OutputMatrix(app.mulResultMatrix, app.mulResultX0, app.mulResultY0, 
                 app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
                 min(app.mulScrEntry1FontSize,app.mulScrEntry2FontSize)/2, app)
@@ -617,12 +497,39 @@ def mousePressed(app, event):
         elif app.screen == 'matMulResult':
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'matMul'
+            if app.stepsButton.mousePressed(app, event.x, event.y):
+                app.scrollY = 0 # resets scroll value
+                app.screen = 'matMulSteps'
+        
+        elif app.screen == 'matMulSteps':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'matMulResult'
         
         # For Tranpose and its sub-screens
         elif app.screen == 'matTpose':
-            if app.backButton.x0 <= event.x <= app.backButton.x1 and\
-                app.backButton.y0 <= event.y <= app.backButton.y1:
+            if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'matCal'
+            for i in range(len(app.textBoxes[2][0])):
+                app.textBoxes[2][0][i].mousePressed(app, event.x, event.y)
+            app.textBoxes[2][1].mousePressed(app, event.x, event.y)
+
+            # Solving here (EDIT)
+            if app.solveButton.mousePressed(app, event.x, event.y):
+            # and app.textBoxes[2][1].isFilled():
+                # M = app.textBoxes[2][1].matrix()
+                M = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
+                app.tposeResultMatrix = matTpose(M)
+                app.tposeResult = OutputMatrix(app.tposeResultMatrix, app.tposeResultX0, app.tposeResultY0, 
+                        app.tposeResultX1, app.tposeResultY1, 'peach puff', 'tan4', app.tposeScrEntryFontSize/2, app)
+                app.screen = 'matTposeResult'
+            
+            # Clearing here
+            if app.clearButton.mousePressed(app, event.x, event.y):
+                app.textBoxes[2][1].clear()
+            
+        elif app.screen == 'matTposeResult':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'matTpose'
 
 
     # elif app.screen == 'matCal':
@@ -673,6 +580,9 @@ def drawSolveButton(app, canvas):
 def drawClearButton(app, canvas):
     app.clearButton.redraw(app, canvas)
 
+def drawStepsButton(app, canvas):
+    app.stepsButton.redraw(app, canvas)
+
 # ***** SCREEN REDRAW FUNCTIONS *****
 def redrawMatCalScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -685,14 +595,19 @@ def redrawMatCalScreen(app, canvas):
 def redrawMatAddScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
-    canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Addition",
-    fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
-
     drawSolveButton(app, canvas)
     drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Addition",
+    fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
     
     for i in range(len(app.textBoxes[0][0])):
         app.textBoxes[0][0][i].redraw(app, canvas)
+    
+    canvas.create_text(app.matAddMargin + 0.5*app.addScrDimTBWidth,
+         0.22*app.height, text='rows', fill='tan4', font=f'Century {int(app.addScrTitleSize/2)}', justify=CENTER)
+    canvas.create_text(int( app.matAddMargin + 1.5*app.addScrDimTBWidth + app.addScrDimTBSep) ,
+         0.22*app.height, text='columns', fill='tan4', font=f'Century {int(app.addScrTitleSize/2)}', justify=CENTER)
+    
     app.textBoxes[0][1].redraw(app, canvas)
     app.textBoxes[0][2].redraw(app, canvas)
 
@@ -706,25 +621,27 @@ def redrawMatAddResultScreen(app, canvas):
     fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
     app.addResult.redraw(app, canvas)
 
-    # for i in range(len(app.addResult)):
-    #     for j in range(len(app.addResult[0])):
-    #         canvas.create_text
-
 def redrawMatMulScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
-    canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Multiplication",
-    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
-
     drawSolveButton(app, canvas)
     drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Multiplication",
+    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
 
     for i in range(len(app.textBoxes[0][0])):
         app.textBoxes[1][0][i].redraw(app, canvas)
         app.textBoxes[1][1][i].redraw(app, canvas)
+        canvas.create_text(int(app.matMulMargin/2 + app.mulScrDimTBWidth/2 + i*app.width/2),
+         0.22*app.height, text='rows', fill='tan4', font=f'Century {int(app.addScrTitleSize/2)}', justify=CENTER)
+        canvas.create_text(int(app.matMulMargin/2 + app.mulScrDimTBWidth + app.mulScrDimTBSep + app.mulScrDimTBWidth/2 + i*app.width/2),
+         0.22*app.height, text='columns', fill='tan4', font=f'Century {int(app.addScrTitleSize/2)}', justify=CENTER)
     
     app.textBoxes[1][2].redraw(app, canvas)
     app.textBoxes[1][3].redraw(app, canvas)
+
+    canvas.create_text(app.width/2, app.height/2, text="×",
+    fill='tan4', font=f'Century {app.addScrTitleSize*3} bold', justify=CENTER)
 
 def redrawMatMulResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -732,17 +649,62 @@ def redrawMatMulResultScreen(app, canvas):
     canvas.create_text(app.width/2, 0.1*app.height, text="Matrix Multiplication\nResult:",
     fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
     app.mulResult.redraw(app, canvas)
+    drawStepsButton(app, canvas)
+
+def redrawMatMulStepsScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="Matrix Multiplication\nResult:",
+    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
+
+    for i in range(len(app.mulSteps)):
+        canvas.create_text(app.width/2, 0.3*app.height + i*0.15*app.height + app.scrollY, text=f'{app.mulSteps[i]}',
+    fill='tan4', font=f'Century {int(app.mulScrTitleSize/2)}', justify=CENTER)
 
 def redrawMatTposeScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
     canvas.create_text(app.width/2, 0.05*app.height, text="Obtain Transpose",
     fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
 
+    for i in range(len(app.textBoxes[2][0])):
+        app.textBoxes[2][0][i].redraw(app, canvas)
+    
+    canvas.create_text(app.tposeMargin + 0.5*app.tposeScrDimTBWidth,
+         0.22*app.height, text='rows', fill='tan4', font=f'Century {int(app.tposeScrTitleSize/2)}', justify=CENTER)
+    canvas.create_text(int( app.tposeMargin + 1.5*app.tposeScrDimTBWidth + app.tposeScrDimTBSep) ,
+         0.22*app.height, text='columns', fill='tan4', font=f'Century {int(app.tposeScrTitleSize/2)}', justify=CENTER)
+    
+    app.textBoxes[2][1].redraw(app, canvas)
+
+def redrawMatTposeResultScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height, text="Obtain Transpose\nResult:",
+    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
+    app.tposeResult.redraw(app, canvas)
+
+
 def redrawGEScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+
+def redrawGEResultScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+
+def redrawGEStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     
 def redrawSOLEScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+
+def redrawSOLEResultsScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+
+def redrawSOLEStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     
 def redrawLUScreen(app, canvas):
@@ -763,34 +725,22 @@ def redrawGSScreen(app, canvas):
 
 def redrawAll(app, canvas):
     canvas.create_rectangle(0, 0, app.width, app.height, width=0, fill='linen')
-    if app.screen == 'home':
-        redrawHomeScreen(app, canvas)
-    elif app.screen == 'matCal':
-        redrawMatCalScreen(app,canvas)
-    elif app.screen == 'matAdd':
-        redrawMatAddScreen(app, canvas)
-    elif app.screen == 'matAddResult':
-        redrawMatAddResultScreen(app, canvas)
-    elif app.screen == 'matMul':
-        redrawMatMulScreen(app, canvas)
-    elif app.screen == 'matMulResult':
-        redrawMatMulResultScreen(app, canvas)
-    elif app.screen == 'matTpose':
-        redrawMatTposeScreen(app, canvas)
-    elif app.screen == 'GE':
-        redrawGEScreen(app, canvas)
-    elif app.screen == 'SOLE':
-        redrawSOLEScreen(app, canvas)
-    elif app.screen == 'LU':
-        redrawLUScreen(app, canvas)
-    elif app.screen == 'inverse':
-        redrawInverseScreen(app, canvas)
-    elif app.screen == '4FS':
-        redraw4FSScreen(app, canvas)
-    elif app.screen == 'det':
-        redrawDetScreen(app, canvas)
-    elif app.screen == 'GS':
-        redrawGSScreen(app, canvas)
+    if app.screen == 'home': redrawHomeScreen(app, canvas)
+    elif app.screen == 'matCal': redrawMatCalScreen(app,canvas)
+    elif app.screen == 'matAdd': redrawMatAddScreen(app, canvas)
+    elif app.screen == 'matAddResult': redrawMatAddResultScreen(app, canvas)
+    elif app.screen == 'matMul': redrawMatMulScreen(app, canvas)
+    elif app.screen == 'matMulResult': redrawMatMulResultScreen(app, canvas)
+    elif app.screen == 'matMulSteps': redrawMatMulStepsScreen(app, canvas)
+    elif app.screen == 'matTpose': redrawMatTposeScreen(app, canvas)
+    elif app.screen == 'matTposeResult': redrawMatTposeResultScreen(app, canvas)
+    elif app.screen == 'GE': redrawGEScreen(app, canvas)
+    elif app.screen == 'SOLE': redrawSOLEScreen(app, canvas)
+    elif app.screen == 'LU': redrawLUScreen(app, canvas)
+    elif app.screen == 'inverse': redrawInverseScreen(app, canvas)
+    elif app.screen == '4FS': redraw4FSScreen(app, canvas)
+    elif app.screen == 'det': redrawDetScreen(app, canvas)
+    elif app.screen == 'GS': redrawGSScreen(app, canvas)
 
 def run241ForOne():
     runApp(title="241-for-One")
