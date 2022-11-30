@@ -353,6 +353,9 @@ def SOLEScreenInit(app):
     'peach puff', 'tan4', app.SOLEScrEntryFontSize, app))
 
     # *** SOLE RESULT SCREEN ***
+    # SOLE Result State (0 - No soln; 1 - Unique soln; 2 - infinite solns)
+    app.SOLEResultState = None
+
     app.SOLEResultX0 = app.width/5
     app.SOLEResultY0 = app.height/4
     app.SOLEResultX1 = app.width - app.SOLEResultX0
@@ -603,16 +606,40 @@ def SOLEMousePressed(app, event):
     if app.solveButton.mousePressed(app, event.x, event.y):
     # and app.textBoxes[4][1].isFilled():
         # M = app.textBoxes[4][1].matrix()
-        # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]
+        # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]  # no solutions
+        # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]] # unique solution
+        # infinite solutions M below
         M = \
         [[3, 2, 3, 4, 2, 2, 7, 2],
         [1, 2, 7, 6, 4, 5, 2, 3],
         [4, 2, 2, 3, 2, 4, 6, 1],
         [4, 5, 6, 2, 3, 1, 4, 0]]
         # app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
-        if not isinstance(SOLE(M), str):
-            app.SOLEResultMatrix = SOLE(M)
-            app.SOLEResult = OutputMatrix(app.SOLEResultMatrix, app.SOLEResultX0, app.SOLEResultY0, 
+        # check if matrix has solutions
+        app.SOLEResultState = SOLEWithSteps(M)[0]
+        app.SOLEResultMatrix = SOLEWithSteps(M)[1]
+        header = []  # contains headers labelling each col of output with respective value
+        if app.SOLEResultState == 0:    # No solutions
+            for i in range(len(app.SOLEResultMatrix)-1):
+                header.append(f'a{i+1}')
+            header.append('c')
+            app.SOLEResultMatrix.insert(0, header)
+            # print(app.SOLEResultMatrix)
+        elif app.SOLEResultState == 1:  # Unique solution
+            for i in range(len(app.SOLEResultMatrix)):
+                header.append(f'x{i+1}')
+            app.SOLEResultMatrix=[header, app.SOLEResultMatrix]
+        else:   # Infinite solutions
+            print(app.SOLEResultMatrix)
+            for i in range(len(app.SOLEResultMatrix[0])):
+                header.append(f'x{i+1}')
+            app.SOLEResultMatrix.insert(0, header)
+            for i in range(0, len(app.SOLEResultMatrix)):
+                if i == 0:
+                    app.SOLEResultMatrix[i].insert(0, '')
+                else:
+                    app.SOLEResultMatrix[i].insert(0, f't{i}')
+        app.SOLEResult = OutputMatrix(app.SOLEResultMatrix, app.SOLEResultX0, app.SOLEResultY0, 
                     app.SOLEResultX1, app.SOLEResultY1, 'peach puff', 'tan4', app.SOLEScrEntryFontSize/2, app)
         app.screen = 'SOLEResult'
 
@@ -840,6 +867,17 @@ def redrawSOLEResultScreen(app, canvas):
     app.SOLEResult.redraw(app, canvas)
     drawStepsButton(app, canvas)
     drawBackHomeButton(app, canvas)
+
+    if app.SOLEResultState == 0:
+        canvas.create_text(app.width/2, 0.22*app.height, text="No solution",
+    fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/1.5)} bold', justify=CENTER)
+    elif app.SOLEResultState == 1:
+        canvas.create_text(app.width/2, 0.22*app.height, text="Unique solution",
+    fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/1.5)} bold', justify=CENTER)
+    else:
+        canvas.create_text(app.width/2, 0.22*app.height, text="Special solutions",
+    fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/1.5)} bold', justify=CENTER)
+
 
 def redrawSOLEStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)

@@ -7,10 +7,16 @@ def create2DList(rows, cols):
     return [([0]*cols) for row in range(rows)]
 
 def roundOffEntries(M):
-    rows, cols = len(M), len(M[0])
-    for row in range(rows):
+    # if 2D
+    if isinstance(M[0], list):
+        rows, cols = len(M), len(M[0])
+        for row in range(rows):
+            for col in range(cols):
+                M[row][col] = float("%.2f" % M[row][col])
+    else: # if 1D
+        cols = len(M)
         for col in range(cols):
-            M[row][col] = float("%.2f" % M[row][col])
+            M[col] = float("%.2f" % M[col])
     return M
 
 def rowExchange(inputM, R1, R2):

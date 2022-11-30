@@ -66,7 +66,59 @@ def SOLE(inputM):
     # return x
     return roundOffEntries(x)
 
-# def SOLEWithSteps(inputM):
+def SOLEWithSteps(inputM):
+    rows, cols = len(inputM), len(inputM[0])
+    smallestDim = min(rows, cols-1)
+    refM = GE(inputM)
+    steps = []
+    stepCount = 1
+    steps.append(f'Step {stepCount}:\nPerform Gaussian Elimination\n{matToStr(roundOffEntries(refM))}')
+
+    # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
+    if not isConsistent(refM):
+        # return f"Reduced system {refM} is inconsistent! \n{inputM} has no solutions!"
+        return 0, refM
+    
+    ### Solving here ###
+    # check if rows up to smallestDim has pivots
+    # store pivot variable and free variable col indices
+    pivots, freeVars = [], []
+    for col in range(cols-1):
+        if col < rows and refM[col][col] != 0:
+                pivots.append(col)
+    for col in range(cols-1):
+        if col not in pivots:
+            freeVars.append(col)
+
+    # print(pivots, freeVars) #*
+    
+    # Case 2: Unique solution; no free variables (freeVars)
+    if len(freeVars) == 0:
+        x = [0]*(cols-1)
+        x[cols-2]=refM[cols-2][cols-1]/refM[cols-2][cols-2]
+        for col in range(cols-3,-1,-1):
+            constant = refM[col][cols-1]
+            for xCol in range(cols-2, col,-1):
+                constant -= x[xCol]*refM[col][xCol]
+            x[col] = constant/refM[col][col]
+        # return x
+        return 1, roundOffEntries(x)
+    
+    # Case 3: Special solutions
+    x = create2DList(len(freeVars), cols-1)
+    for solNum in range(len(freeVars)):
+        for freeV in freeVars:
+            x[solNum][freeV] = 1    # setting one of the free variables to one
+            freeVars.remove(freeV)
+            break
+        xRow = x[solNum]
+        for pivotIndex in range(len(pivots)-1, -1, -1):
+            constant = refM[pivots[pivotIndex]][cols-1]
+            for xCol in range(cols-2, pivots[pivotIndex],-1):
+                constant -= xRow[xCol]*refM[pivots[pivotIndex]][xCol]
+            xRow[pivots[pivotIndex]] = constant/refM[pivots[pivotIndex]][pivots[pivotIndex]]
+    # return x
+    return 2, roundOffEntries(x)
 
 ### Testing here ###
 

@@ -191,7 +191,9 @@ class OutputMatrix:
         self.text = [(['']*self.cols) for row in range(self.rows)]
         for i in range(self.rows):
             for j in range(self.cols):
-                self.text[i][j] = str("%.2f" % matrix[i][j])
+                if not isinstance(matrix[i][j], str):
+                    self.text[i][j] = str("%.2f" % matrix[i][j])
+                else: self.text[i][j] = matrix[i][j]
         self.isSelected = [([None]*self.cols) for row in range(self.rows)]
     
     def mouseMoved(self, app, eventX, eventY):
