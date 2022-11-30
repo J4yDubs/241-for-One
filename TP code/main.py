@@ -20,7 +20,7 @@ def appStarted(app):
 
     # scrolling
     app.scrollY = 0
-    app.scrollKeys = {'Up': 5, 'Down': -5}
+    app.scrollKeys = {'Up': 10, 'Down': -10}
 
     # app.buttons indices:
     # 0: home, 1: calc, 2: add, 3: mult, 4: tpose
@@ -290,10 +290,22 @@ def appStarted(app):
     app.GEScrEntryTBCols = int(app.textBoxes[3][0][1].text)
     app.GEScrEntryFontSize = min((app.GEScrEntryTBHeight)/(2*app.GEScrEntryTBRows),
     (app.GEScrEntryTBWidth)/(2*app.GEScrEntryTBCols))
-    app.textBoxes[2].append(MatrixEntry( app.GEScrEntryTBRows, app.GEScrEntryTBCols, 
+    app.textBoxes[3].append(MatrixEntry( app.GEScrEntryTBRows, app.GEScrEntryTBCols, 
     app.width/2 - app.GEScrEntryTBWidth/2, app.GEScrEntryTBY0, 
     app.width/2 + app.GEScrEntryTBWidth/2, app.GEScrEntryTBY1, 
     'peach puff', 'tan4', app.GEScrEntryFontSize, app))
+
+    # *** GE RESULT SCREEN ***
+    app.GEResultX0 = app.width/3
+    app.GEResultY0 = app.height/5
+    app.GEResultX1 = app.width - app.GEResultX0
+    app.GEResultY1 = app.GEResultY0 + (app.GEResultX1 - app.GEResultX0)
+    app.GEResultMatrix = create2DList(app.GEScrEntryTBRows, app.GEScrEntryTBCols)
+    app.GEResult = OutputMatrix(app.GEResultMatrix, app.GEResultX0, app.GEResultY0, 
+    app.GEResultX1, app.GEResultY1, 'peach puff', 'tan4', app.GEScrEntryFontSize, app)
+
+    # *** GE STEPS SCREEN ***
+    app.GESteps = []
 
 def keyPressed(app, event):
     # *** MATRIX ADDITION SCREEN ***
@@ -368,10 +380,28 @@ def keyPressed(app, event):
                         app.width/2 - app.tposeScrEntryTBWidth/2, app.tposeScrEntryTBY0, 
                         app.width/2 + app.tposeScrEntryTBWidth/2, app.tposeScrEntryTBY1, 
                         'peach puff', 'tan4', app.tposeScrEntryFontSize, app)
-                app.tposeResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)
+                app.tposeResultMatrix = create2DList(app.tposeScrEntryTBRows, app.tposeScrEntryTBCols)
         app.textBoxes[2][1].keyPressed(app, event.key)
+
+    elif app.screen == 'GE':
+        for i in range(len(app.textBoxes[3][0])):
+            if app.textBoxes[3][0][i].keyPressed(app, event.key):
+                if app.textBoxes[3][0][0].text != '':
+                    app.GEScrEntryTBRows = int(app.textBoxes[3][0][0].text)
+                    app.GEScrEntryFontSize = min((app.GEScrEntryTBHeight)/(2*app.GEScrEntryTBRows),
+                    (app.GEScrEntryTBWidth)/(2*app.GEScrEntryTBCols))
+                if app.textBoxes[3][0][1].text != '':
+                    app.GEScrEntryTBCols = int(app.textBoxes[3][0][1].text)
+                    app.GEScrEntryFontSize = min((app.GEScrEntryTBHeight)/(2*app.GEScrEntryTBRows),
+                    (app.GEScrEntryTBWidth)/(2*app.GEScrEntryTBCols))
+                app.textBoxes[3][1] = MatrixEntry( app.GEScrEntryTBRows, app.GEScrEntryTBCols, 
+                        app.width/2 - app.GEScrEntryTBWidth/2, app.GEScrEntryTBY0, 
+                        app.width/2 + app.GEScrEntryTBWidth/2, app.GEScrEntryTBY1, 
+                        'peach puff', 'tan4', app.GEScrEntryFontSize, app)
+                app.GEResultMatrix = create2DList(app.GEScrEntryTBRows, app.GEScrEntryTBCols)
+        app.textBoxes[3][1].keyPressed(app, event.key)
         
-    if app.screen == 'matMulSteps' or '':   # extend to other steps screens
+    if app.screen == 'matMulSteps' or 'GESteps':   # extend to other steps screens
         scrollKeyPressed(app, event)
 
 def mouseMoved(app, event):
@@ -417,7 +447,19 @@ def mouseMoved(app, event):
                 app.textBoxes[2][0][i].mouseMoved(app, event.x, event.y)
             app.textBoxes[2][1].mouseMoved(app, event.x, event.y)
 
+        elif app.screen == 'GE':
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
+            for i in range(len(app.textBoxes[3][0])):
+                app.textBoxes[3][0][i].mouseMoved(app, event.x, event.y)
+            app.textBoxes[3][1].mouseMoved(app, event.x, event.y)
 
+        elif app.screen == 'GEResult':
+            app.stepsButton.mouseMoved(app, event.x, event.y)
+        # elif app.screen == 'GESteps':
+        #     pass
+
+    
 def mousePressed(app, event):
     # For home screen
     if app.screen == 'home':
@@ -450,7 +492,7 @@ def mousePressed(app, event):
                     for j in range(app.addScrEntryTBCols):
                         app.addResultMatrix[i][j] += float(app.textBoxes[0][1].text[i][j]) + float(app.textBoxes[0][2].text[i][j])
                 app.addResult = OutputMatrix(app.addResultMatrix, app.addResultX0, app.addResultY0, 
-                        app.addResultX1, app.addResultY1, 'peach puff', 'tan4', app.addScrEntryFontSize, app)
+                        app.addResultX1, app.addResultY1, 'peach puff', 'tan4', app.addScrEntryFontSize/2, app)
                 app.screen = 'matAddResult'
             
             # Clearing here
@@ -472,7 +514,7 @@ def mousePressed(app, event):
             app.textBoxes[1][2].mousePressed(app, event.x, event.y)
             app.textBoxes[1][3].mousePressed(app, event.x, event.y)
 
-            # Solving here (MULT)
+            # Solving here
             if app.solveButton.mousePressed(app, event.x, event.y):
                 # and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
                 # and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
@@ -508,7 +550,7 @@ def mousePressed(app, event):
                 app.textBoxes[2][0][i].mousePressed(app, event.x, event.y)
             app.textBoxes[2][1].mousePressed(app, event.x, event.y)
 
-            # Solving here (EDIT)
+            # Solving here
             if app.solveButton.mousePressed(app, event.x, event.y):
             # and app.textBoxes[2][1].isFilled():
                 # M = app.textBoxes[2][1].matrix()
@@ -526,6 +568,35 @@ def mousePressed(app, event):
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'matTpose'
 
+        elif app.screen == 'GE':
+            for i in range(len(app.textBoxes[3][0])):
+                app.textBoxes[3][0][i].mousePressed(app, event.x, event.y)
+            app.textBoxes[3][1].mousePressed(app, event.x, event.y)
+
+            # Solving here *EDIT THIS*
+            if app.solveButton.mousePressed(app, event.x, event.y):
+            # and app.textBoxes[3][1].isFilled():
+                # M = app.textBoxes[3][1].matrix()
+                M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]
+                app.GEResultMatrix, app.GESteps = GEWithSteps(M)
+                app.GEResult = OutputMatrix(app.GEResultMatrix, app.GEResultX0, app.GEResultY0, 
+                        app.GEResultX1, app.GEResultY1, 'peach puff', 'tan4', app.GEScrEntryFontSize/2, app)
+                app.screen = 'GEResult'
+
+            # Clearing here
+            if app.clearButton.mousePressed(app, event.x, event.y):
+                app.textBoxes[3][1].clear()
+
+        elif app.screen == 'GEResult':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'GE'
+            if app.stepsButton.mousePressed(app, event.x, event.y):
+                app.scrollY = 0 # resets scroll value
+                app.screen = 'GESteps'
+
+        elif app.screen == 'GESteps':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'GEResult'
 
     # elif app.screen == 'matCal':
 
@@ -662,7 +733,7 @@ def redrawMatTposeScreen(app, canvas):
     drawSolveButton(app, canvas)
     drawClearButton(app, canvas)
     canvas.create_text(app.width/2, 0.05*app.height, text="Obtain Transpose",
-    fill='tan4', font=f'Century {app.addScrTitleSize} bold', justify=CENTER)
+    fill='tan4', font=f'Century {app.tposeScrTitleSize} bold', justify=CENTER)
 
     for i in range(len(app.textBoxes[2][0])):
         app.textBoxes[2][0][i].redraw(app, canvas)
@@ -678,18 +749,47 @@ def redrawMatTposeResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
     canvas.create_text(app.width/2, 0.1*app.height, text="Obtain Transpose\nResult:",
-    fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
+    fill='tan4', font=f'Century {app.tposeScrTitleSize} bold', justify=CENTER)
     app.tposeResult.redraw(app, canvas)
 
 
 def redrawGEScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.05*app.height, text="Gaussian Elimination",
+    fill='tan4', font=f'Century {app.GEScrTitleSize} bold', justify=CENTER)
+
+    for i in range(len(app.textBoxes[3][0])):
+        app.textBoxes[3][0][i].redraw(app, canvas)
+
+    canvas.create_text(app.GEMargin + 0.5*app.GEScrDimTBWidth,
+         0.22*app.height, text='rows', fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER)
+    canvas.create_text(int( app.GEMargin + 1.5*app.GEScrDimTBWidth + app.GEScrDimTBSep) ,
+         0.22*app.height, text='columns', fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER)
+
+    app.textBoxes[3][1].redraw(app, canvas)
 
 def redrawGEResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height, text="Gaussian Elimination\nResult:",
+    fill='tan4', font=f'Century {app.GEScrTitleSize} bold', justify=CENTER)
+    app.GEResult.redraw(app, canvas)
+    drawStepsButton(app, canvas)
 
 def redrawGEStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="Gaussian Elimination\nResult:",
+    fill='tan4', font=f'Century {app.GEScrTitleSize} bold', justify=CENTER)
+
+    canvas.create_text(app.width/2, 0.3*app.height + app.scrollY, text=f'{app.GESteps[0]}',
+    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)} bold', justify=CENTER)
+    for i in range(1, len(app.GESteps)-1):
+        canvas.create_text(app.width/2, 0.3*app.height + i*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[i]}',
+    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER)
+    canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[-1]}',
+    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)} bold', justify=CENTER)
     
 def redrawSOLEScreen(app, canvas):
     drawBackHomeButton(app, canvas)

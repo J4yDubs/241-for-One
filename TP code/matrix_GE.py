@@ -46,15 +46,26 @@ def GE(inputM):
                 else:    # if both have different signs
                     inputM[row][colElim] =\
                     inputM[row][colElim] + abs(pivotRatio)*inputM[col][colElim]
-    return inputM
+    return roundOffEntries(inputM)
+
+# to convert list into str (to display each row on a separate line)
+def matToStr(inputM):
+    outputStr = ''
+    rows = len(inputM)
+    for row in range(rows):
+        outputStr += str(inputM[row])+'\n'
+    return outputStr[:-1]
 
 # Same as GE function above but displays steps
 def GEWithSteps(inputM):
     rows = len(inputM)
     cols = len(inputM[0])
-    smallestDim = min(rows, cols)   # iterates n-1 times; where n is the 
-    # smallest dimension
+    smallestDim = min(rows, cols)   # iterates n-1 times; where n is the smallest dimension
     stepCount = 1
+    steps = []
+
+    steps.append(f'Input Matrix:\n{matToStr(roundOffEntries(inputM))}')
+    # print(steps[-1])
 
     for col in range(smallestDim-1):   # iterate through all but last col
         if not hasPivots(inputM, col, col): # checks for pivots in the col
@@ -67,9 +78,9 @@ def GEWithSteps(inputM):
                 for pivotRow in range(col+1, rows): # searches for next non-zero pivot
                     if inputM[pivotRow][col] != 0:
                         rowExchange(inputM, col, pivotRow)
-                print(f"***Step {stepCount}*** \nR{col+1} ⇔  R{pivotRow+1}")
-                print(f"Intermediate output: {inputM}\n")
-                stepCount += 1
+                        steps.append(f'Step {stepCount}:\nR{col+1} ⇔  R{pivotRow+1}\n{matToStr(roundOffEntries(inputM))}')
+                        # print(steps[-1])
+                        stepCount += 1
                 pivot = inputM[col][col]    # reassigns new pivot value
 
             pivotRatio = inputM[row][col]/pivot
@@ -81,12 +92,13 @@ def GEWithSteps(inputM):
                     inputM[row][colElim] =\
                     inputM[row][colElim] + abs(pivotRatio)*inputM[col][colElim]
             if pivotRatio > 0:
-                print(f"***Step {stepCount}*** \nR{row+1} → R{row+1} - {pivotRatio}×R{col+1}")
-            else:
-                print(f"***Step {stepCount}*** \nR{row+1} → R{row+1} + {abs(pivotRatio)}×R{col+1}")     
-            print(f"Intermediate output: {inputM}\n")
+                steps.append(f'Step {stepCount}:\nR{row+1} → R{row+1} - ({inputM[row][col]}÷{pivot})×R{col+1}\n{matToStr(roundOffEntries(inputM))}')
+            else:     
+                steps.append(f'Step {stepCount}:\nR{row+1} → R{row+1} + ({abs(inputM[row][col])}÷{abs(pivot)})×R{col+1}\n{matToStr(roundOffEntries(inputM))}')
+            # print(steps[-1])
             stepCount += 1
-    return f"------------------\n***FINAL RESULT*** {inputM}\n------------------\n"
+    steps.append(f'REF Matrix:\n{matToStr(roundOffEntries(inputM))}')
+    return (roundOffEntries(inputM), steps)
 
 def RREF(inputM):
     refM = GE(inputM)
@@ -133,7 +145,7 @@ def doGE():
 
 # M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]] # tricky, requires row exchange
 # print(GEWithSteps(M))
-# # print(GE(M))
+# print(GE(M))
 
 # M = [[2, 3, -2, 6], [0, 0, 3, -6], [1, 0, 2, -3]]
 # print(GEWithSteps(M))
