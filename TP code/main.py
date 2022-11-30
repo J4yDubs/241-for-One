@@ -37,6 +37,7 @@ def appStarted(app):
     mulScreenInit(app)
     tposeScreenInit(app)
     GEScreenInit(app)
+    SOLEScreenInit(app)
 
 def keyPressed(app, event):
     if app.screen == 'matAdd':
@@ -47,6 +48,8 @@ def keyPressed(app, event):
         matTposeKeyPressed(app, event)
     elif app.screen == 'GE':
         GEKeyPressed(app, event)
+    elif app.screen == 'SOLE':
+        SOLEKeyPressed(app, event)
         
     # scrolling for screens
     if app.screen == 'matMulSteps' or 'GESteps':   # extend to other steps screens
@@ -104,9 +107,17 @@ def mouseMoved(app, event):
 
         elif app.screen == 'GEResult':
             app.stepsButton.mouseMoved(app, event.x, event.y)
-        # elif app.screen == 'GESteps':
-        #     pass
+        
+        elif app.screen == 'SOLE':
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
+            for i in range(len(app.textBoxes[4][0])):
+                app.textBoxes[4][0][i].mouseMoved(app, event.x, event.y)
+            app.textBoxes[4][1].mouseMoved(app, event.x, event.y)
 
+        elif app.screen == 'SOLEResult':
+            app.stepsButton.mouseMoved(app, event.x, event.y)
+        
     
 def mousePressed(app, event):
     # For home screen
@@ -163,7 +174,19 @@ def mousePressed(app, event):
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'GEResult'
 
-    # elif app.screen == 'matCal':
+        # For SOLE and its sub-screens
+        elif app.screen == 'SOLE':
+            SOLEMousePressed(app, event)
+        elif app.screen == 'SOLEResult':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'SOLE'
+            if app.stepsButton.mousePressed(app, event.x, event.y):
+                app.scrollY = 0 # resets scroll value
+                app.screen = 'SOLESteps'
+        elif app.screen == 'SOLESteps':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'SOLEResult'
+        
 
 def redrawAll(app, canvas):
     canvas.create_rectangle(0, 0, app.width, app.height, width=0, fill='linen')
@@ -203,8 +226,6 @@ def redrawAll(app, canvas):
     elif app.screen == 'SOLESteps': 
         redrawSOLEStepsScreen(app, canvas)
 
-    elif app.screen == 'SOLE': 
-        redrawSOLEScreen(app, canvas)
     elif app.screen == 'LU': 
         redrawLUScreen(app, canvas)
     elif app.screen == 'inverse': 

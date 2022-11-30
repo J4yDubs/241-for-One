@@ -47,7 +47,8 @@ def SOLE(inputM):
             for xCol in range(cols-2, col,-1):
                 constant -= x[xCol]*refM[col][xCol]
             x[col] = constant/refM[col][col]
-        return x
+        # return x
+        return roundOffEntries(x)
     
     # Case 3: Special solutions
     x = create2DList(len(freeVars), cols-1)
@@ -62,7 +63,8 @@ def SOLE(inputM):
             for xCol in range(cols-2, pivots[pivotIndex],-1):
                 constant -= xRow[xCol]*refM[pivots[pivotIndex]][xCol]
             xRow[pivots[pivotIndex]] = constant/refM[pivots[pivotIndex]][pivots[pivotIndex]]
-    return x
+    # return x
+    return roundOffEntries(x)
 
 # def SOLEWithSteps(inputM):
 
@@ -80,13 +82,14 @@ def SOLE(inputM):
 # M = [[1, 2, 3, 4, 2, 2], [1, 3, 2, 6, 4, 7], [1, 2, 2, 3, 2, 4]]
 # print(SOLE(M))
 
-# # infinite solutions (dim(N(M)) = 
+# infinite solutions (dim(N(M)) = 
 # M = \
 # [[3, 2, 3, 4, 2, 2, 7, 2],
 # [1, 2, 7, 6, 4, 5, 2, 3],
 # [4, 2, 2, 3, 2, 4, 6, 1],
 # [4, 5, 6, 2, 3, 1, 4, 0]]
 # print(SOLE(M))
+
 
 # M = [[2, 3, -2, 6, 0], [0, 0, 3, -6, 0], [1, 0, 2, -3, 0]]
 # print(SOLE(M))

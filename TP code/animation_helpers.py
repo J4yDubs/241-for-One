@@ -320,6 +320,50 @@ def GEScreenInit(app):
     # *** GE STEPS SCREEN ***
     app.GESteps = []
 
+def SOLEScreenInit(app):
+    # *** SOLE SCREEN ***
+    # text box margins
+    app.SOLEMargin = app.width/2.5
+    # font sizes
+    app.SOLEScrTitleSize = int(app.height/20)
+    # Text Box Dims
+    # i) dimension text boxes
+    app.SOLEScrDimTBWidth = 0.05*app.width
+    app.SOLEScrDimTBHeight = app.SOLEScrDimTBWidth
+    app.SOLEScrDimTBSep = (app.width-2*app.SOLEMargin-2*app.SOLEScrDimTBWidth)
+    for i in range(2):
+        app.textBoxes[4][0].append(DimTextBox(int( app.SOLEMargin + i*(app.SOLEScrDimTBWidth + app.SOLEScrDimTBSep) ),
+         0.11*app.height, 
+         app.SOLEScrDimTBWidth, app.SOLEScrDimTBHeight, 
+         'peach puff', 'tan4', app.SOLEScrDimTBHeight/2, app))
+    # ii) entry text boxes
+    app.SOLEScrEntryTBX0 = app.width/10
+    app.SOLEScrEntryTBY0 = 0.27*app.height
+    app.SOLEScrEntryTBX1 = app.width/2-app.SOLEScrEntryTBX0
+    app.SOLEScrEntryTBY1 = app.SOLEScrEntryTBY0 + (app.SOLEScrEntryTBX1 - app.SOLEScrEntryTBX0) # square
+    app.SOLEScrEntryTBWidth = app.SOLEScrEntryTBX1 - app.SOLEScrEntryTBX0
+    app.SOLEScrEntryTBHeight = app.SOLEScrEntryTBY1 - app.SOLEScrEntryTBY0
+    app.SOLEScrEntryTBRows = int(app.textBoxes[4][0][0].text)
+    app.SOLEScrEntryTBCols = int(app.textBoxes[4][0][1].text)
+    app.SOLEScrEntryFontSize = min((app.SOLEScrEntryTBHeight)/(2*app.SOLEScrEntryTBRows),
+    (app.SOLEScrEntryTBWidth)/(2*app.SOLEScrEntryTBCols))
+    app.textBoxes[4].append(MatrixEntry( app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols, 
+    app.width/2 - app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY0, 
+    app.width/2 + app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY1, 
+    'peach puff', 'tan4', app.SOLEScrEntryFontSize, app))
+
+    # *** SOLE RESULT SCREEN ***
+    app.SOLEResultX0 = app.width/5
+    app.SOLEResultY0 = app.height/4
+    app.SOLEResultX1 = app.width - app.SOLEResultX0
+    app.SOLEResultY1 = app.SOLEResultY0 + (1/3)*app.width
+    app.SOLEResultMatrix = create2DList(app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols)
+    app.SOLEResult = OutputMatrix(app.SOLEResultMatrix, app.SOLEResultX0, app.SOLEResultY0, 
+    app.SOLEResultX1, app.SOLEResultY1, 'peach puff', 'tan4', app.SOLEScrEntryFontSize, app)
+
+    # *** SOLE STEPS SCREEN ***
+    app.SOLESteps = []
+
 # *****************************************************************
 # ********************* KEYPRESSED FUNCTIONS **********************
 # *****************************************************************
@@ -419,6 +463,25 @@ def GEKeyPressed(app, event):
                     'peach puff', 'tan4', app.GEScrEntryFontSize, app)
             app.GEResultMatrix = create2DList(app.GEScrEntryTBRows, app.GEScrEntryTBCols)
     app.textBoxes[3][1].keyPressed(app, event.key)
+
+# SOLE screen keyPressed function
+def SOLEKeyPressed(app, event):
+    for i in range(len(app.textBoxes[4][0])):
+        if app.textBoxes[4][0][i].keyPressed(app, event.key):
+            if app.textBoxes[4][0][0].text != '':
+                app.SOLEScrEntryTBRows = int(app.textBoxes[4][0][0].text)
+                app.SOLEScrEntryFontSize = min((app.SOLEScrEntryTBHeight)/(2*app.SOLEScrEntryTBRows),
+                (app.SOLEScrEntryTBWidth)/(2*app.SOLEScrEntryTBCols))
+            if app.textBoxes[4][0][1].text != '':
+                app.SOLEScrEntryTBCols = int(app.textBoxes[4][0][1].text)
+                app.SOLEScrEntryFontSize = min((app.SOLEScrEntryTBHeight)/(2*app.SOLEScrEntryTBRows),
+                (app.SOLEScrEntryTBWidth)/(2*app.SOLEScrEntryTBCols))
+            app.textBoxes[4][1] = MatrixEntry( app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols, 
+                    app.width/2 - app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY0, 
+                    app.width/2 + app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY1, 
+                    'peach puff', 'tan4', app.SOLEScrEntryFontSize, app)
+            app.SOLEResultMatrix = create2DList(app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols)
+    app.textBoxes[4][1].keyPressed(app, event.key)
 
 # Scrolling keyPressed
 def scrollKeyPressed(app, event):
@@ -529,6 +592,33 @@ def GEMousePressed(app, event):
     # Clearing here
     if app.clearButton.mousePressed(app, event.x, event.y):
         app.textBoxes[3][1].clear()
+
+# SOLE mousePressed
+def SOLEMousePressed(app, event):
+    for i in range(len(app.textBoxes[4][0])):
+        app.textBoxes[4][0][i].mousePressed(app, event.x, event.y)
+    app.textBoxes[4][1].mousePressed(app, event.x, event.y)
+
+    # Solving here
+    if app.solveButton.mousePressed(app, event.x, event.y):
+    # and app.textBoxes[4][1].isFilled():
+        # M = app.textBoxes[4][1].matrix()
+        # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]
+        M = \
+        [[3, 2, 3, 4, 2, 2, 7, 2],
+        [1, 2, 7, 6, 4, 5, 2, 3],
+        [4, 2, 2, 3, 2, 4, 6, 1],
+        [4, 5, 6, 2, 3, 1, 4, 0]]
+        # app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
+        if not isinstance(SOLE(M), str):
+            app.SOLEResultMatrix = SOLE(M)
+            app.SOLEResult = OutputMatrix(app.SOLEResultMatrix, app.SOLEResultX0, app.SOLEResultY0, 
+                    app.SOLEResultX1, app.SOLEResultY1, 'peach puff', 'tan4', app.SOLEScrEntryFontSize/2, app)
+        app.screen = 'SOLEResult'
+
+    # Clearing here
+    if app.clearButton.mousePressed(app, event.x, event.y):
+        app.textBoxes[4][1].clear()
 
 # *****************************************************************
 # ******************** REDRAW BUTTON FUNCTIONS ********************
@@ -728,8 +818,27 @@ def redrawGEStepsScreen(app, canvas):
     
 def redrawSOLEScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.05*app.height, text="Systems of Linear Equations",
+    fill='tan4', font=f'Century {app.SOLEScrTitleSize} bold', justify=CENTER)
+
+    for i in range(len(app.textBoxes[4][0])):
+        app.textBoxes[4][0][i].redraw(app, canvas)
+
+    canvas.create_text(app.SOLEMargin + 0.5*app.SOLEScrDimTBWidth,
+         0.22*app.height, text='rows', fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
+    canvas.create_text(int( app.SOLEMargin + 1.5*app.SOLEScrDimTBWidth + app.SOLEScrDimTBSep) ,
+         0.22*app.height, text='columns', fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
+
+    app.textBoxes[4][1].redraw(app, canvas)
 
 def redrawSOLEResultScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height, text="System of Linear Equations\nResult:",
+    fill='tan4', font=f'Century {app.SOLEScrTitleSize} bold', justify=CENTER)
+    app.SOLEResult.redraw(app, canvas)
+    drawStepsButton(app, canvas)
     drawBackHomeButton(app, canvas)
 
 def redrawSOLEStepsScreen(app, canvas):
