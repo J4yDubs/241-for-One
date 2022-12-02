@@ -344,10 +344,10 @@ def SOLEScreenInit(app):
     app.SOLEScrEntryTBWidth = app.SOLEScrEntryTBX1 - app.SOLEScrEntryTBX0
     app.SOLEScrEntryTBHeight = app.SOLEScrEntryTBY1 - app.SOLEScrEntryTBY0
     app.SOLEScrEntryTBRows = int(app.textBoxes[4][0][0].text)
-    app.SOLEScrEntryTBCols = int(app.textBoxes[4][0][1].text)
+    app.SOLEScrEntryTBCols = int(app.textBoxes[4][0][1].text)+1
     app.SOLEScrEntryFontSize = min((app.SOLEScrEntryTBHeight)/(2*app.SOLEScrEntryTBRows),
     (app.SOLEScrEntryTBWidth)/(2*app.SOLEScrEntryTBCols))
-    app.textBoxes[4].append(MatrixEntry( app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols, 
+    app.textBoxes[4].append(AMEntryTextBox( app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols, 
     app.width/2 - app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY0, 
     app.width/2 + app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY1, 
     'peach puff', 'tan4', app.SOLEScrEntryFontSize, app))
@@ -476,10 +476,10 @@ def SOLEKeyPressed(app, event):
                 app.SOLEScrEntryFontSize = min((app.SOLEScrEntryTBHeight)/(2*app.SOLEScrEntryTBRows),
                 (app.SOLEScrEntryTBWidth)/(2*app.SOLEScrEntryTBCols))
             if app.textBoxes[4][0][1].text != '':
-                app.SOLEScrEntryTBCols = int(app.textBoxes[4][0][1].text)
+                app.SOLEScrEntryTBCols = int(app.textBoxes[4][0][1].text)+1
                 app.SOLEScrEntryFontSize = min((app.SOLEScrEntryTBHeight)/(2*app.SOLEScrEntryTBRows),
                 (app.SOLEScrEntryTBWidth)/(2*app.SOLEScrEntryTBCols))
-            app.textBoxes[4][1] = MatrixEntry( app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols, 
+            app.textBoxes[4][1] = AMEntryTextBox( app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols, 
                     app.width/2 - app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY0, 
                     app.width/2 + app.SOLEScrEntryTBWidth/2, app.SOLEScrEntryTBY1, 
                     'peach puff', 'tan4', app.SOLEScrEntryFontSize, app)
