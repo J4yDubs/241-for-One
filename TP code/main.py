@@ -19,7 +19,7 @@ def appStarted(app):
     stepsButtonInit(app)
 
     # *** VALID KEYS ***
-    app.numKeys = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}
+    app.numKeys = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-'}
     app.scrollKeys = {'Up': 10, 'Down': -10}
 
     # scrolling

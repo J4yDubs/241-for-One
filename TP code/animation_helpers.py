@@ -538,11 +538,11 @@ def matMulMousePressed(app, event):
     app.textBoxes[1][3].mousePressed(app, event.x, event.y)
 
     # Solving here
-    if app.solveButton.mousePressed(app, event.x, event.y):
-        # and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
-        # and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
-        # M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
-        M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
+    if app.solveButton.mousePressed(app, event.x, event.y)\
+        and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
+        and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
+        M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
+        # M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
         app.mulResultMatrix, app.mulSteps = matMulWithSteps(M1, M2)
         app.mulResult = OutputMatrix(app.mulResultMatrix, app.mulResultX0, app.mulResultY0, 
         app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
@@ -563,10 +563,10 @@ def tposeMousePressed(app, event):
     app.textBoxes[2][1].mousePressed(app, event.x, event.y)
 
     # Solving here
-    if app.solveButton.mousePressed(app, event.x, event.y):
-    # and app.textBoxes[2][1].isFilled():
-        # M = app.textBoxes[2][1].matrix()
-        M = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
+    if app.solveButton.mousePressed(app, event.x, event.y)\
+    and app.textBoxes[2][1].isFilled():
+        M = app.textBoxes[2][1].matrix()
+        # M = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
         app.tposeResultMatrix = matTpose(M)
         app.tposeResult = OutputMatrix(app.tposeResultMatrix, app.tposeResultX0, app.tposeResultY0, 
                 app.tposeResultX1, app.tposeResultY1, 'peach puff', 'tan4', app.tposeScrEntryFontSize/2, app)
@@ -583,10 +583,10 @@ def GEMousePressed(app, event):
     app.textBoxes[3][1].mousePressed(app, event.x, event.y)
 
     # Solving here
-    if app.solveButton.mousePressed(app, event.x, event.y):
-    # and app.textBoxes[3][1].isFilled():
-        # M = app.textBoxes[3][1].matrix()
-        M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]
+    if app.solveButton.mousePressed(app, event.x, event.y)\
+    and app.textBoxes[3][1].isFilled():
+        M = app.textBoxes[3][1].matrix()
+        # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]
         app.GEResultMatrix, app.GESteps = GEWithSteps(M)
         app.GEResult = OutputMatrix(app.GEResultMatrix, app.GEResultX0, app.GEResultY0, 
                 app.GEResultX1, app.GEResultY1, 'peach puff', 'tan4', app.GEScrEntryFontSize/2, app)
@@ -603,17 +603,17 @@ def SOLEMousePressed(app, event):
     app.textBoxes[4][1].mousePressed(app, event.x, event.y)
 
     # Solving here
-    if app.solveButton.mousePressed(app, event.x, event.y):
-    # and app.textBoxes[4][1].isFilled():
-        # M = app.textBoxes[4][1].matrix()
+    if app.solveButton.mousePressed(app, event.x, event.y)\
+    and app.textBoxes[4][1].isFilled():
+        M = app.textBoxes[4][1].matrix()
         # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]  # no solutions
         # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]] # unique solution
         # infinite solutions M below
-        M = \
-        [[3, 2, 3, 4, 2, 2, 7, 2],
-        [1, 2, 7, 6, 4, 5, 2, 3],
-        [4, 2, 2, 3, 2, 4, 6, 1],
-        [4, 5, 6, 2, 3, 1, 4, 0]]
+        # M = \
+        # [[3, 2, 3, 4, 2, 2, 7, 2],
+        # [1, 2, 7, 6, 4, 5, 2, 3],
+        # [4, 2, 2, 3, 2, 4, 6, 1],
+        # [4, 5, 6, 2, 3, 1, 4, 0]]
         # app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
         # check if matrix has solutions
         app.SOLEResultState = SOLEWithSteps(M)[0]
@@ -824,6 +824,7 @@ def redrawGEScreen(app, canvas):
 
 def redrawGEResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
     canvas.create_text(app.width/2, 0.1*app.height, text="Gaussian Elimination\nResult:",
     fill='tan4', font=f'Century {app.GEScrTitleSize} bold', justify=CENTER)
     app.GEResult.redraw(app, canvas)
