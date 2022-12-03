@@ -236,17 +236,11 @@ class MatrixTextBox(TextBox):
 class AMEntryTextBox(MatrixEntry):
     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
         super().__init__(rows, cols, x0, y0, x1, y1, color, outline, fontSize, app)
-        print(self.cols)
         self.color = [([self.baseColor]*(self.cols)) for row in range(self.rows)]
         self.baseColors = [([self.baseColor]*self.cols) for row in range(self.rows)]
         self.constColColor = 'DarkGoldenrod1'   # this is the color for the constants col of the augmented matrix
         for i in range(self.rows):
-        #     self.baseColors[i].append(self.constColColor)
-            # self.color[i][-1] = self.constColColor
             self.baseColors[i][-1] = self.constColColor
-        print(self.baseColors)
-        # self.text = [(['']*(self.cols)) for row in range(self.rows)]
-        # self.isSelected = [([None]*(self.cols)) for row in range(self.rows)]
 
     def mousePressed(self, app, eventX, eventY):
         for i in range(self.rows):
