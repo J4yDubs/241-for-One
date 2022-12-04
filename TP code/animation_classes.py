@@ -254,3 +254,5 @@ class AMEntryTextBox(MatrixEntry):
         self.constColColor = 'DarkGoldenrod1'   # this is the color for the constants col of the augmented matrix
         for i in range(self.rows):
             self.baseColors[i][-1] = self.constColColor
+
+# Create header class

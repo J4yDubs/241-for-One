@@ -49,14 +49,6 @@ def GE(inputM):
                     inputM[row][colElim] + abs(pivotRatio)*inputM[col][colElim]
     return roundOffEntries(inputM)
 
-# to convert list into str (to display each row on a separate line)
-def matToStr(inputM):
-    outputStr = ''
-    rows = len(inputM)
-    for row in range(rows):
-        outputStr += str(inputM[row])+'\n'
-    return outputStr[:-1]
-
 # Same as GE function above but displays steps
 def GEWithSteps(inputM):
     rows = len(inputM)

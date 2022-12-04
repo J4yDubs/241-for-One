@@ -773,9 +773,11 @@ def redrawMatMulStepsScreen(app, canvas):
     canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="Matrix Multiplication\nResult:",
     fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
 
-    for i in range(len(app.mulSteps)):
+    for i in range(len(app.mulSteps)-1):
         canvas.create_text(app.width/2, 0.3*app.height + i*0.15*app.height + app.scrollY, text=f'{app.mulSteps[i]}',
     fill='tan4', font=f'Century {int(app.mulScrTitleSize/2)}', justify=CENTER)
+    canvas.create_text(app.width/2, 0.3*app.height + (i+1)*0.15*app.height + app.scrollY, text=f'{app.mulSteps[-1]}',
+    fill='tan4', font=f'Century {int(app.mulScrTitleSize/2)} bold', justify=CENTER)
 
 def redrawMatTposeScreen(app, canvas):
     drawBackHomeButton(app, canvas)

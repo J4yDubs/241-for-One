@@ -22,6 +22,14 @@ def roundOffEntries(M):
             M[col] = float("%.2f" % M[col])
     return M
 
+# to convert list into str (to display each row on a separate line)
+def matToStr(inputM):
+    outputStr = ''
+    rows = len(inputM)
+    for row in range(rows):
+        outputStr += str(inputM[row])+'\n'
+    return outputStr[:-1]
+
 def rowExchange(inputM, R1, R2):
     temp = inputM[R2]
     inputM[R2] = inputM[R1]
@@ -85,10 +93,10 @@ def matMulWithSteps(M1, M2):
             products = matMulWithStepsHelper(M1, M2, row, col)[1]
             for product in products:
                 productStr += str("%.2f" % product[0])+'×'+str("%.2f" % product[1])+' + '
-            steps.append(f'Step {stepCount}:\n({row}, {col}) entry = {productStr[:-2]}\n= {prodM[row][col]}')
+            steps.append(f'Step {stepCount}:\n({row+1}, {col+1}) entry = {productStr[:-2]}\n= {prodM[row][col]}')
             # print(steps[-1])
             stepCount += 1
-    
+    steps.append(f'Matrix Product:\n{matToStr(roundOffEntries(prodM))}')
     return roundOffEntries(prodM), steps
 
 def matTpose(inputM):
