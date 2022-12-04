@@ -95,6 +95,7 @@ class MatrixEntry():
         self.width = (x1 - x0)/cols
         self.height = (y1 - y0)/rows
         self.baseColor = color
+        self.baseColors = [([self.baseColor]*self.cols) for row in range(self.rows)]
         self.color = [([self.baseColor]*self.cols) for row in range(self.rows)]
         self.outline = outline
         self.fontSize = fontSize
@@ -114,7 +115,7 @@ class MatrixEntry():
                     if self.isSelected[i][j]:
                         self.color[i][j] = 'tan1'
                     else:
-                        self.color[i][j] = self.baseColor
+                        self.color[i][j] = self.baseColors[i][j]
 
     def mousePressed(self, app, eventX, eventY):
         for i in range(self.rows):
@@ -127,7 +128,7 @@ class MatrixEntry():
                     self.color[i][j] = 'tan1'
                     self.isSelected[i][j] = True
                 else:
-                    self.color[i][j] = self.baseColor
+                    self.color[i][j] = self.baseColors[i][j]
                     self.isSelected[i][j] = False
 
     def keyPressed(self, app, eventKey):
@@ -141,7 +142,7 @@ class MatrixEntry():
                     elif eventKey == 'Backspace' or eventKey == 'Delete':
                         self.text[i][j] = self.text[i][j][:-1]
                     elif eventKey in app.entryNavKeys:
-                        self.color[i][j] = self.baseColor
+                        self.color[i][j] = self.baseColors[i][j]
                         self.isSelected[i][j] = False
                         if (eventKey == 'Up' and i>0) \
                             or (eventKey == 'Down' and i<(self.rows-1)):
@@ -253,48 +254,3 @@ class AMEntryTextBox(MatrixEntry):
         self.constColColor = 'DarkGoldenrod1'   # this is the color for the constants col of the augmented matrix
         for i in range(self.rows):
             self.baseColors[i][-1] = self.constColColor
-
-    def mousePressed(self, app, eventX, eventY):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                entryX0 = self.x0 + j*self.width
-                entryX1 = entryX0 + self.width
-                entryY0 = self.y0 + i*self.height
-                entryY1 = entryY0 + self.height
-                if entryX0 <= eventX <= entryX1 and entryY0 <= eventY <= entryY1:
-                    self.color[i][j] = 'tan1'
-                    self.isSelected[i][j] = True
-                else:
-                    self.color[i][j] = self.baseColors[i][j]
-                    self.isSelected[i][j] = False
-
-    def mouseMoved(self, app, eventX, eventY):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                entryX0 = self.x0 + j*self.width
-                entryX1 = entryX0 + self.width
-                entryY0 = self.y0 + i*self.height
-                entryY1 = entryY0 + self.height
-                if entryX0 <= eventX <= entryX1 and entryY0 <= eventY <= entryY1 and not self.isSelected[i][j]:
-                    self.color[i][j] = 'navajo white'
-                else:
-                    if self.isSelected[i][j]:
-                        self.color[i][j] = 'tan1'
-                    else:
-                        self.color[i][j] = self.baseColors[i][j]
-
-    def redraw(self, app, canvas):
-        if self.rows and self.cols > 0:
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    entryX0 = self.x0 + j*self.width
-                    entryX1 = entryX0 + self.width
-                    entryY0 = self.y0 + i*self.height
-                    entryY1 = entryY0 + self.height
-                    canvas.create_rectangle(entryX0, entryY0, entryX1, entryY1, fill=self.color[i][j], outline=self.outline)
-                    if self.isSelected[i][j]:
-                        canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill='linen', 
-                        font=f'Century {int(self.fontSize)}', justify=CENTER)
-                    else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
-                        font=f'Century {int(self.fontSize)}', justify=CENTER)
-

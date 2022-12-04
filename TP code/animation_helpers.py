@@ -603,18 +603,18 @@ def SOLEMousePressed(app, event):
     app.textBoxes[4][1].mousePressed(app, event.x, event.y)
 
     # Solving here
-    if app.solveButton.mousePressed(app, event.x, event.y):
-    # and app.textBoxes[4][1].isFilled():
-    #     M = app.textBoxes[4][1].matrix()
+    if app.solveButton.mousePressed(app, event.x, event.y) \
+    and app.textBoxes[4][1].isFilled():
+        M = app.textBoxes[4][1].matrix()
 
         # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]  # no solutions
         # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]] # unique solution
         # infinite solutions M below
-        M = \
-        [[3, 2, 3, 4, 2, 2, 7, 2],
-        [1, 2, 7, 6, 4, 5, 2, 3],
-        [4, 2, 2, 3, 2, 4, 6, 1],
-        [4, 5, 6, 2, 3, 1, 4, 0]]
+        # M = \
+        # [[3, 2, 3, 4, 2, 2, 7, 2],
+        # [1, 2, 7, 6, 4, 5, 2, 3],
+        # [4, 2, 2, 3, 2, 4, 6, 1],
+        # [4, 5, 6, 2, 3, 1, 4, 0]]
 
         # check if matrix has solutions based on result state
         app.SOLEResultState, app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
