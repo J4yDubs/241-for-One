@@ -74,7 +74,7 @@ def SOLEWithSteps(inputM):
 
     # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
     if not isConsistent(refM):
-        steps.append(f'Notice that all columns but the constant value in the last row reduces to 0.\nThis system of equations is therefore inconsistent.')
+        steps.append(f'Notice that all columns but the constant value in the last row reduce to 0.\nThis system of equations is therefore inconsistent.')
         return 0, refM, steps
     
     stepCount += 1
@@ -97,7 +97,7 @@ def SOLEWithSteps(inputM):
         x = [0]*(cols-1)
         x[cols-2]=refM[cols-2][cols-1]/refM[cols-2][cols-2]
         steps.append('Proceed with back-substitution in the remaining steps below:')
-        steps.append(f'Step {stepCount}:\nx{cols-1} = {refM[cols-2][cols-1]}÷{refM[cols-2][cols-2]}\n= {x[cols-2]}')
+        steps.append(f'Step {stepCount}:\nx{cols-1} = {refM[cols-2][cols-1]}÷{refM[cols-2][cols-2]}\n= {roundOff(x[cols-2])}')
         stepCount += 1
         for col in range(cols-3,-1,-1):
             constant = refM[col][cols-1]
@@ -111,23 +111,23 @@ def SOLEWithSteps(inputM):
         
         steps.append(f'Unique solution:\n')
         for i in range(len(x)):
-            steps[-1] += f'x{i+1} = {roundOff(x[i])}\n'
+            steps[-1] += f'x{i+1} = {roundOff(x[i])}, '
+        steps[-1] = steps[-1][:-2]
 
-        # testing to see steps
-        for step in steps:
-            print(step)
+        # # testing to see steps
+        # for step in steps:
+        #     print(step)
 
         return 1, roundOffEntries(x), steps
     
     # Case 3: Special solutions
     x = create2DList(len(freeVars), cols-1)
-    steps.append('All entries in the last row reduce to 0 which indicates infinite solutions\nProceed with finding the special solutions below:')
+    steps.append('The matrix lacks full rank and this indicates infinite solutions.\nProceed with finding the special solutions below:')
     for solNum in range(len(freeVars)):
         for freeV in freeVars:
             x[solNum][freeV] = 1    # setting one of the free variables to one
             freeVars.remove(freeV)
-            steps.append(f'Computing solution {solNum+1}:')
-            steps.append(f'Step {stepCount}:\nSet free variable x{freeV+1} to 1 and the rest to 0')
+            steps.append(f'Computing solution {solNum+1}:\nStep {stepCount}:\nSet free variable x{freeV+1} to 1 and the rest to 0')
             stepCount += 1
             break
         xRow = x[solNum]
@@ -144,17 +144,18 @@ def SOLEWithSteps(inputM):
     for i in range(len(x)):
         steps.append(f'Special solution {i+1}:\n')
         for j in range(len(x[i])):
-            steps[-1] += f'x{j+1} = {roundOff(x[i][j])}\n'
+            steps[-1] += f'x{j+1} = {roundOff(x[i][j])}, '
+        steps[-1] = steps[-1][:-2]
 
-    # testing to see steps
-    for step in steps:
-        print(step)
+    # # testing to see steps
+    # for step in steps:
+    #     print(step)
     
     return 2, roundOffEntries(x), steps
 
 ### Testing here ###
 
-# # unique solution
+# unique solution
 # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]]
 # print(SOLEWithSteps(M))
 # print(SOLE(M))

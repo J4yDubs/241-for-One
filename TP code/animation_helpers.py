@@ -77,8 +77,8 @@ def screensInit(app):
      ['matMul', 'matMulResult', 'matMulSteps'], 
      ['matTpose', 'matTposeResult']], 
     ['GE', 'GEResult', 'GESteps'], 
-    ['SOLE', 'SOLEResult', 'SOLESteps'], 
-    ['LU'], ['inverse'], ['4FS'], ['det'], ['GS'],
+    ['SOLE', 'SOLEResult', 'SOLESteps'],
+    ['det'], ['inverse'], ['4FS'], ['LU'], ['GS'],
     ['home'] ]
     app.screen = app.screens[-1][0]
 
@@ -94,11 +94,11 @@ def homeScreenInit(app):
     app.homeButtonsText = [
         ('General Matrix\nCalculator', int(app.homeScrTitleSize/3)), 
         ('Gaussian\nElimination', int(app.homeScrTitleSize/3)),
-        ('Solving Systems of\nLinear Equations', int(app.homeScrTitleSize/3.3)), 
-        ('LU-Factorization', int(app.homeScrTitleSize/3)), 
+        ('Solving Systems of\nLinear Equations', int(app.homeScrTitleSize/3.3)),
+        ('Determinant', int(app.homeScrTitleSize/3)),   
         ('Inverse', int(app.homeScrTitleSize/3)),
         ('4 Fundamental\nSubspaces', int(app.homeScrTitleSize/3)), 
-        ('Determinant', int(app.homeScrTitleSize/3)),
+        ('LU-Factorization', int(app.homeScrTitleSize/3)),
         ('Orthonormal\nBases', int(app.homeScrTitleSize/3)),
         ]
     # creating home buttons with button object
@@ -603,34 +603,32 @@ def SOLEMousePressed(app, event):
     app.textBoxes[4][1].mousePressed(app, event.x, event.y)
 
     # Solving here
-    if app.solveButton.mousePressed(app, event.x, event.y)\
-    and app.textBoxes[4][1].isFilled():
-        M = app.textBoxes[4][1].matrix()
+    if app.solveButton.mousePressed(app, event.x, event.y):
+    # and app.textBoxes[4][1].isFilled():
+    #     M = app.textBoxes[4][1].matrix()
+
         # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]  # no solutions
         # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]] # unique solution
         # infinite solutions M below
-        # M = \
-        # [[3, 2, 3, 4, 2, 2, 7, 2],
-        # [1, 2, 7, 6, 4, 5, 2, 3],
-        # [4, 2, 2, 3, 2, 4, 6, 1],
-        # [4, 5, 6, 2, 3, 1, 4, 0]]
-        # app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
-        # check if matrix has solutions
-        app.SOLEResultState = SOLEWithSteps(M)[0]
-        app.SOLEResultMatrix = SOLEWithSteps(M)[1]
+        M = \
+        [[3, 2, 3, 4, 2, 2, 7, 2],
+        [1, 2, 7, 6, 4, 5, 2, 3],
+        [4, 2, 2, 3, 2, 4, 6, 1],
+        [4, 5, 6, 2, 3, 1, 4, 0]]
+
+        # check if matrix has solutions based on result state
+        app.SOLEResultState, app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
         header = []  # contains headers labelling each col of output with respective value
         if app.SOLEResultState == 0:    # No solutions
             for i in range(len(app.SOLEResultMatrix)-1):
                 header.append(f'a{i+1}')
             header.append('c')
             app.SOLEResultMatrix.insert(0, header)
-            # print(app.SOLEResultMatrix)
         elif app.SOLEResultState == 1:  # Unique solution
             for i in range(len(app.SOLEResultMatrix)):
                 header.append(f'x{i+1}')
             app.SOLEResultMatrix=[header, app.SOLEResultMatrix]
         else:   # Infinite solutions
-            print(app.SOLEResultMatrix)
             for i in range(len(app.SOLEResultMatrix[0])):
                 header.append(f'x{i+1}')
             app.SOLEResultMatrix.insert(0, header)
@@ -867,7 +865,7 @@ def redrawSOLEResultScreen(app, canvas):
     fill='tan4', font=f'Century {app.SOLEScrTitleSize} bold', justify=CENTER)
     app.SOLEResult.redraw(app, canvas)
     drawStepsButton(app, canvas)
-    drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
 
     if app.SOLEResultState == 0:
         canvas.create_text(app.width/2, 0.22*app.height, text="No solution",
@@ -882,6 +880,26 @@ def redrawSOLEResultScreen(app, canvas):
 
 def redrawSOLEStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height, text="System of Linear Equations\nResult:",
+    fill='tan4', font=f'Century {app.SOLEScrTitleSize} bold', justify=CENTER)
+
+    if app.SOLEResultState == 0:
+        for i in range(0, len(app.SOLESteps)-1):
+            canvas.create_text(app.width/2, 0.3*app.height + i*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[i]}',
+            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
+        canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[-1]}',
+            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)} bold', justify=CENTER)
+    
+    else:
+        for i in range(0, len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)):
+            canvas.create_text(app.width/2, 0.3*app.height + i*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[i]}',
+            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
+        for j in range(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1), len(app.SOLESteps)):
+            canvas.create_text(app.width/2, 
+            0.3*app.height + (i+1)*app.SOLEScrEntryTBRows/15*app.height + (j-(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)))*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, 
+            text=f'{app.SOLESteps[j]}',
+            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)} bold', justify=CENTER)
     
 def redrawLUScreen(app, canvas):
     drawBackHomeButton(app, canvas)
