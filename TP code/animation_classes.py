@@ -132,14 +132,26 @@ class MatrixEntry():
 
     def keyPressed(self, app, eventKey):
         # checks if length if eventKey is 1
+        count = 0   # to prevent infinite loop in entry selection
         for i in range(self.rows):
             for j in range(self.cols):
-                if self.isSelected[i][j]:
+                if self.isSelected[i][j] and count==0:
                     if eventKey in app.numKeys:
                         self.text[i][j] += eventKey
                     elif eventKey == 'Backspace' or eventKey == 'Delete':
                         self.text[i][j] = self.text[i][j][:-1]
-
+                    elif eventKey in app.entryNavKeys:
+                        self.color[i][j] = self.baseColor
+                        self.isSelected[i][j] = False
+                        if (eventKey == 'Up' and i>0) \
+                            or (eventKey == 'Down' and i<(self.rows-1)):
+                            self.color[i+app.entryNavKeys[eventKey]][j] = 'tan1'
+                            self.isSelected[i+app.entryNavKeys[eventKey]][j] = True
+                        elif (eventKey == 'Left' and j>0) \
+                            or (eventKey == 'Right' and j<(self.cols-1)):
+                            self.color[i][j+app.entryNavKeys[eventKey]] = 'tan1'
+                            self.isSelected[i][j+app.entryNavKeys[eventKey]] = True
+                        count += 1
     def redraw(self, app, canvas):
         if self.rows and self.cols > 0:
             for i in range(self.rows):
