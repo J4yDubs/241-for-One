@@ -6,6 +6,9 @@ def mean(x,y):
 def create2DList(rows, cols):
     return [([0]*cols) for row in range(rows)]
 
+def roundOff(entry):
+    return float("%.2f" % entry)
+
 def roundOffEntries(M):
     # if 2D
     if isinstance(M[0], list):
