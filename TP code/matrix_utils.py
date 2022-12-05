@@ -30,6 +30,13 @@ def matToStr(inputM):
         outputStr += str(inputM[row])+'\n'
     return outputStr[:-1]
 
+# to concatenate a list of steps into a single string and separating each step with a new line
+def concatSteps(steps):
+    stepsConcat = ''
+    for step in steps:
+        stepsConcat += step + '\n\n'
+    return stepsConcat
+
 def rowExchange(inputM, R1, R2):
     temp = inputM[R2]
     inputM[R2] = inputM[R1]

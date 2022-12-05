@@ -52,6 +52,8 @@ def keyPressed(app, event):
         GEKeyPressed(app, event)
     elif app.screen == 'SOLE':
         SOLEKeyPressed(app, event)
+    elif app.screen == 'det':
+        detKeyPressed(app, event)
         
     # scrolling for screens
     if app.screen == 'matMulSteps' or 'GESteps' or 'SOLESteps' or 'detSteps':   # extend to other steps screens
@@ -118,6 +120,15 @@ def mouseMoved(app, event):
             app.textBoxes[4][1].mouseMoved(app, event.x, event.y)
 
         elif app.screen == 'SOLEResult':
+            app.stepsButton.mouseMoved(app, event.x, event.y)
+
+        elif app.screen == 'det':
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
+            app.textBoxes[5][0][0].mouseMoved(app, event.x, event.y)
+            app.textBoxes[5][1].mouseMoved(app, event.x, event.y)
+
+        elif app.screen == 'detResult':
             app.stepsButton.mouseMoved(app, event.x, event.y)
         
     
@@ -189,6 +200,19 @@ def mousePressed(app, event):
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'SOLEResult'
         
+        # For det and its sub-screens
+        elif app.screen == 'det':
+            detMousePressed(app, event)
+        elif app.screen == 'detResult':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'det'
+            if app.stepsButton.mousePressed(app, event.x, event.y):
+                app.scrollY = 0 # resets scroll value
+                app.screen = 'detSteps'
+        elif app.screen == 'detSteps':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'detResult'
+        
 
 def redrawAll(app, canvas):
     canvas.create_rectangle(0, 0, app.width, app.height, width=0, fill='linen')
@@ -230,6 +254,10 @@ def redrawAll(app, canvas):
 
     elif app.screen == 'det': 
         redrawDetScreen(app, canvas)
+    elif app.screen == 'detResult':
+        redrawDetResultScreen(app, canvas)
+    elif app.screen == 'detSteps':
+        redrawDetStepsScreen(app, canvas)
 
     elif app.screen == 'LU': 
         redrawLUScreen(app, canvas)

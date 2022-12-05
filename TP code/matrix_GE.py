@@ -93,7 +93,7 @@ def GEWithSteps(inputM):
             # print(steps[-1])
             stepCount += 1
     steps.append(f'REF Matrix:\n{matToStr(roundOffEntries(inputM))}')
-    return (roundOffEntries(inputM), steps)
+    return (roundOffEntries(inputM), concatSteps(steps))
 
 def RREF(inputM):
     refM = GE(inputM)

@@ -1,8 +1,10 @@
 from matrix_utils import *
 from matrix_GE import *
 from matrix_SOLE import *
+from matrix_det import *
 from cmu_112_graphics import *
 from animation_classes import *
+import tkinter as tk
 
 # Taken from Piazza by instructor Joe Ritze (to get screen dimensions to get fullscreen)
 def fitToScreen(app):
@@ -374,14 +376,14 @@ def detScreenInit(app):
     # text box margins
     app.detMargin = app.width/2.5
     # font sizes
-    app.detScrTitleSize = int(app.height/20)
+    app.detScrTitleSize = int(app.height/23)
     # Text Box Dims
     # i) dimension text box (only 1 as square matrix required)
     app.detScrDimTBWidth = 0.05*app.width
     app.detScrDimTBHeight = app.detScrDimTBWidth
     # app.detScrDimTBSep = (app.width-2*app.detMargin-2*app.detScrDimTBWidth)
     app.textBoxes[5][0].append(DimTextBox(int( app.width/2 - app.detScrDimTBWidth/2 ),
-        0.11*app.height, 
+        0.14*app.height, 
         app.detScrDimTBWidth, app.detScrDimTBHeight, 
         'peach puff', 'tan4', app.detScrDimTBHeight/2, app))
     # ii) entry text boxes
@@ -399,16 +401,17 @@ def detScreenInit(app):
     app.width/2 + app.detScrEntryTBWidth/2, app.detScrEntryTBY1, 
     'peach puff', 'tan4', app.detScrEntryFontSize, app))
 
-    # *** GE RESULT SCREEN ***
-    app.detResultX0 = app.width/3
+    # *** DET RESULT SCREEN ***
+    app.detResultX0 = app.width/2.85
     app.detResultY0 = app.height/5
     app.detResultX1 = app.width - app.detResultX0
     app.detResultY1 = app.detResultY0 + (app.detResultX1 - app.detResultX0)
     app.detResultMatrix = create2DList(app.detScrEntryTBRows, app.detScrEntryTBCols)
     app.detResult = OutputMatrix(app.detResultMatrix, app.detResultX0, app.detResultY0, 
     app.detResultX1, app.detResultY1, 'peach puff', 'tan4', app.detScrEntryFontSize, app)
+    app.detValue = None
 
-    # *** GE STEPS SCREEN ***
+    # *** DET STEPS SCREEN ***
     app.detSteps = [] 
 
 # *****************************************************************
@@ -529,6 +532,23 @@ def SOLEKeyPressed(app, event):
                     'peach puff', 'tan4', app.SOLEScrEntryFontSize, app)
             app.SOLEResultMatrix = create2DList(app.SOLEScrEntryTBRows, app.SOLEScrEntryTBCols)
     app.textBoxes[4][1].keyPressed(app, event.key)
+
+# det screen keyPressed function
+def detKeyPressed(app, event):
+    if app.textBoxes[5][0][0].keyPressed(app, event.key):
+        if app.textBoxes[5][0][0].text != '':
+            app.detScrEntryTBRows = int(app.textBoxes[5][0][0].text)
+            app.detScrEntryFontSize = min((app.detScrEntryTBHeight)/(2*app.detScrEntryTBRows),
+            (app.detScrEntryTBWidth)/(2*app.detScrEntryTBCols))
+            app.detScrEntryTBCols = int(app.textBoxes[5][0][0].text)
+            app.detScrEntryFontSize = min((app.detScrEntryTBHeight)/(2*app.detScrEntryTBRows),
+            (app.detScrEntryTBWidth)/(2*app.detScrEntryTBCols))
+        app.textBoxes[5][1] = MatrixEntry( app.detScrEntryTBRows, app.detScrEntryTBCols, 
+                app.width/2 - app.detScrEntryTBWidth/2, app.detScrEntryTBY0, 
+                app.width/2 + app.detScrEntryTBWidth/2, app.detScrEntryTBY1, 
+                'peach puff', 'tan4', app.detScrEntryFontSize, app)
+        app.detResultMatrix = create2DList(app.detScrEntryTBRows, app.detScrEntryTBCols)
+    app.textBoxes[5][1].keyPressed(app, event.key)
 
 # Scrolling keyPressed
 def scrollKeyPressed(app, event):
@@ -651,6 +671,7 @@ def SOLEMousePressed(app, event):
     and app.textBoxes[4][1].isFilled():
         M = app.textBoxes[4][1].matrix()
 
+        # testing matrices below
         # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]  # no solutions
         # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]] # unique solution
         # infinite solutions M below
@@ -688,6 +709,29 @@ def SOLEMousePressed(app, event):
     # Clearing here
     if app.clearButton.mousePressed(app, event.x, event.y):
         app.textBoxes[4][1].clear()
+
+def detMousePressed(app, event):
+    app.textBoxes[5][0][0].mousePressed(app, event.x, event.y)
+    app.textBoxes[5][1].mousePressed(app, event.x, event.y)
+
+    # Solving here
+    if app.solveButton.mousePressed(app, event.x, event.y)\
+    and app.textBoxes[5][1].isFilled():
+        M = app.textBoxes[5][1].matrix()
+        # M = [
+        #     [1, 2, 3], 
+        #     [2, 7, 8], 
+        #     [4, 3, 1]
+        #     ]
+        app.detVal, app.detSteps = detCofacWithSteps(M)
+        # displays input matrix in result screen
+        app.detResult = OutputMatrix(M, app.detResultX0, app.detResultY0, 
+                app.detResultX1, app.detResultY1, 'peach puff', 'tan4', app.detScrEntryFontSize/2, app)
+        app.screen = 'detResult'
+
+    # Clearing here
+    if app.clearButton.mousePressed(app, event.x, event.y):
+        app.textBoxes[5][1].clear()
 
 # *****************************************************************
 # ******************** REDRAW BUTTON FUNCTIONS ********************
@@ -879,15 +923,8 @@ def redrawGEStepsScreen(app, canvas):
     drawBackButton(app, canvas)
     canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="Gaussian Elimination\nResult:",
     fill='tan4', font=f'Century {app.GEScrTitleSize} bold', justify=CENTER)
-
-    canvas.create_text(app.width/2, 0.3*app.height + app.scrollY, text=f'{app.GESteps[0]}',
-    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)} bold', justify=CENTER)
-    for i in range(1, len(app.GESteps)-1):
-        canvas.create_text(app.width/2, 0.3*app.height + i*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[i]}',
-    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER)
-    if len(app.GESteps) > 2:
-        canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[-1]}',
-        fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)} bold', justify=CENTER)
+    canvas.create_text(app.width/2, 0.2*app.height + app.scrollY, text=f'{app.GESteps}', 
+    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER, anchor=tk.N)
     
 def redrawSOLEScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -924,31 +961,44 @@ def redrawSOLEResultScreen(app, canvas):
         canvas.create_text(app.width/2, 0.22*app.height, text="Special solutions",
     fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/1.5)} bold', justify=CENTER)
 
-
 def redrawSOLEStepsScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawBackButton(app, canvas)
-    canvas.create_text(app.width/2, 0.1*app.height, text="System of Linear Equations\nResult:",
+    canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="System of Linear Equations\nResult:",
     fill='tan4', font=f'Century {app.SOLEScrTitleSize} bold', justify=CENTER)
+    canvas.create_text(app.width/2, 0.2*app.height + app.scrollY, text=f'{app.SOLESteps}', 
+    fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER, anchor=tk.N)
 
-    if app.SOLEResultState == 0:
-        for i in range(0, len(app.SOLESteps)-1):
-            canvas.create_text(app.width/2, 0.3*app.height + i*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[i]}',
-            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
-        # if len(app.SOLESteps) > 2:
-        canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[-1]}',
-            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)} bold', justify=CENTER)
-    
-    else:
-        for i in range(0, len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)):
-            canvas.create_text(app.width/2, 0.3*app.height + i*(app.SOLEScrEntryTBRows/15*app.height + 60) + app.scrollY, text=f'{app.SOLESteps[i]}',
-            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
-        for j in range(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1), len(app.SOLESteps)):
-            canvas.create_text(app.width/2, 
-            0.3*app.height + (i+1)*(app.SOLEScrEntryTBRows/15*app.height + 60) + (j-(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)))*(app.SOLEScrEntryTBRows/15*app.height + 10) + app.scrollY, 
-            text=f'{app.SOLESteps[j]}',
-            fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)} bold', justify=CENTER)
-    
+def redrawDetScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.07*app.height, text="Determinants\n(via Cofactor Expansion)",
+    fill='tan4', font=f'Century {app.detScrTitleSize} bold', justify=CENTER)
+    app.textBoxes[5][0][0].redraw(app, canvas)
+    canvas.create_text(app.width/2, 0.25*app.height, text='rows and cols each', fill='tan4', 
+    font=f'Century {int(app.detScrTitleSize/2)}', justify=CENTER)
+    app.textBoxes[5][1].redraw(app, canvas)
+
+def redrawDetResultScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height, text="Cofactor Expansion\nResult:",
+    fill='tan4', font=f'Century {app.detScrTitleSize} bold', justify=CENTER)
+    app.detResult.redraw(app, canvas)
+    canvas.create_text(app.width/2, mean(app.detResultY1, 0.8*app.height), 
+    text= f'Determinant = {app.detVal}', 
+    fill='tan4', font=f'Century {int(0.75*app.detScrTitleSize)} bold', justify=CENTER)
+    drawStepsButton(app, canvas)
+
+def redrawDetStepsScreen(app, canvas):
+    drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.1*app.height + app.scrollY, text="Cofactor Expansion\nResult:",
+    fill='tan4', font=f'Century {app.detScrTitleSize} bold', justify=CENTER)
+    canvas.create_text(app.width/2, 0.2*app.height + app.scrollY, text=f'{app.detSteps}', 
+    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER, anchor=tk.N)
+
 def redrawLUScreen(app, canvas):
     drawBackHomeButton(app, canvas)
 
@@ -956,9 +1006,6 @@ def redrawInverseScreen(app, canvas):
     drawBackHomeButton(app, canvas)
 
 def redraw4FSScreen(app, canvas):
-    drawBackHomeButton(app, canvas)
-
-def redrawDetScreen(app, canvas):
     drawBackHomeButton(app, canvas)
 
 def redrawGSScreen(app, canvas):

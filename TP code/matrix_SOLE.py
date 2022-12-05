@@ -87,7 +87,7 @@ def SOLEWithSteps(inputM):
     # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
     if not isConsistent(refM):
         steps.append(f'Notice there is at least one row where all columns except the constant value reduce to 0.\nThis system of equations is therefore inconsistent.')
-        return 0, refM, steps
+        return 0, refM, concatSteps(steps)
     
     stepCount += 1
 
@@ -130,7 +130,7 @@ def SOLEWithSteps(inputM):
         # for step in steps:
         #     print(step)
 
-        return 1, roundOffEntries(x), steps
+        return 1, roundOffEntries(x), concatSteps(steps)
     
     # Case 3: Special solutions
     x = create2DList(len(freeVars), cols-1)
@@ -163,7 +163,7 @@ def SOLEWithSteps(inputM):
     # for step in steps:
     #     print(step)
     
-    return 2, roundOffEntries(x), steps
+    return 2, roundOffEntries(x), concatSteps(steps)
 
 ### Testing here ###
 
