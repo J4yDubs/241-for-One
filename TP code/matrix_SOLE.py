@@ -6,14 +6,26 @@ from matrix_GE import *
 # takes in an augmented matrix (with last col being the constants)
 # Calls on matrix_GE for REF
 
+# takes in a 1D list (row vector) and checks if it is all zero
+def isAllZero(rowVector):
+    for entry in rowVector:
+        if entry != 0:
+            return False
+    return True
+
 def isConsistent(refM):
     rows, cols = len(refM), len(refM[0])
-    if refM[rows-1][cols-1] == 0:
-        return True
-    for col in range(cols-1):
-        if refM[rows-1][col] != 0:
-            return True
-    return False
+    # if refM[rows-1][cols-1] == 0:
+    #     return True
+    # for col in range(cols-1):
+    #     if refM[rows-1][col] != 0:
+    #         return True
+    # return False
+    for row in range(rows):
+        rowVector = refM[row][:-1]
+        if isAllZero(rowVector) and refM[row][-1] != 0:
+            return False
+    return True
 
 def SOLE(inputM):
     rows, cols = len(inputM), len(inputM[0])
@@ -74,7 +86,7 @@ def SOLEWithSteps(inputM):
 
     # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
     if not isConsistent(refM):
-        steps.append(f'Notice that all columns but the constant value in the last row reduce to 0.\nThis system of equations is therefore inconsistent.')
+        steps.append(f'Notice there is at least one row where all columns except the constant value reduce to 0.\nThis system of equations is therefore inconsistent.')
         return 0, refM, steps
     
     stepCount += 1
@@ -154,6 +166,16 @@ def SOLEWithSteps(inputM):
     return 2, roundOffEntries(x), steps
 
 ### Testing here ###
+
+# no solution
+# M = [
+#     [1, 2, 1, 2],
+#     [2, 4, 2, 1],
+#     [3, 2, 1, 0],
+#     [1, 2, 1, 1],
+#     [2  , 2, 2, 2]
+#     ]
+# print(SOLEWithSteps(M))
 
 # unique solution
 # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]]

@@ -78,7 +78,7 @@ def screensInit(app):
      ['matTpose', 'matTposeResult']], 
     ['GE', 'GEResult', 'GESteps'], 
     ['SOLE', 'SOLEResult', 'SOLESteps'],
-    ['det'], ['inverse'], ['4FS'], ['LU'], ['GS'],
+    ['det', 'detResult', 'detSteps'], ['inverse'], ['4FS'], ['LU'], ['GS'],
     ['home'] ]
     app.screen = app.screens[-1][0]
 
@@ -320,6 +320,7 @@ def GEScreenInit(app):
     # *** GE STEPS SCREEN ***
     app.GESteps = []
 
+# Sys of Linear Eqns (SOLE) screen and its sub-screens initializations
 def SOLEScreenInit(app):
     # *** SOLE SCREEN ***
     # text box margins
@@ -366,6 +367,49 @@ def SOLEScreenInit(app):
 
     # *** SOLE STEPS SCREEN ***
     app.SOLESteps = []
+
+# Determinant screen and its sub-screens initializations
+def detScreenInit(app):
+    # *** DET SCREEN ***
+    # text box margins
+    app.detMargin = app.width/2.5
+    # font sizes
+    app.detScrTitleSize = int(app.height/20)
+    # Text Box Dims
+    # i) dimension text box (only 1 as square matrix required)
+    app.detScrDimTBWidth = 0.05*app.width
+    app.detScrDimTBHeight = app.detScrDimTBWidth
+    # app.detScrDimTBSep = (app.width-2*app.detMargin-2*app.detScrDimTBWidth)
+    app.textBoxes[5][0].append(DimTextBox(int( app.width/2 - app.detScrDimTBWidth/2 ),
+        0.11*app.height, 
+        app.detScrDimTBWidth, app.detScrDimTBHeight, 
+        'peach puff', 'tan4', app.detScrDimTBHeight/2, app))
+    # ii) entry text boxes
+    app.detScrEntryTBX0 = app.width/10
+    app.detScrEntryTBY0 = 0.27*app.height
+    app.detScrEntryTBX1 = app.width/2-app.detScrEntryTBX0
+    app.detScrEntryTBY1 = app.detScrEntryTBY0 + (app.detScrEntryTBX1 - app.detScrEntryTBX0) # square
+    app.detScrEntryTBWidth = app.detScrEntryTBX1 - app.detScrEntryTBX0
+    app.detScrEntryTBHeight = app.detScrEntryTBY1 - app.detScrEntryTBY0
+    app.detScrEntryTBRows, app.detScrEntryTBCols = int(app.textBoxes[5][0][0].text), int(app.textBoxes[5][0][0].text)
+    app.detScrEntryFontSize = min((app.detScrEntryTBHeight)/(2*app.detScrEntryTBRows),
+    (app.detScrEntryTBWidth)/(2*app.detScrEntryTBCols))
+    app.textBoxes[5].append(MatrixEntry( app.detScrEntryTBRows, app.detScrEntryTBCols, 
+    app.width/2 - app.detScrEntryTBWidth/2, app.detScrEntryTBY0, 
+    app.width/2 + app.detScrEntryTBWidth/2, app.detScrEntryTBY1, 
+    'peach puff', 'tan4', app.detScrEntryFontSize, app))
+
+    # *** GE RESULT SCREEN ***
+    app.detResultX0 = app.width/3
+    app.detResultY0 = app.height/5
+    app.detResultX1 = app.width - app.detResultX0
+    app.detResultY1 = app.detResultY0 + (app.detResultX1 - app.detResultX0)
+    app.detResultMatrix = create2DList(app.detScrEntryTBRows, app.detScrEntryTBCols)
+    app.detResult = OutputMatrix(app.detResultMatrix, app.detResultX0, app.detResultY0, 
+    app.detResultX1, app.detResultY1, 'peach puff', 'tan4', app.detScrEntryFontSize, app)
+
+    # *** GE STEPS SCREEN ***
+    app.detSteps = [] 
 
 # *****************************************************************
 # ********************* KEYPRESSED FUNCTIONS **********************
@@ -620,7 +664,7 @@ def SOLEMousePressed(app, event):
         app.SOLEResultState, app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
         header = []  # contains headers labelling each col of output with respective value
         if app.SOLEResultState == 0:    # No solutions
-            for i in range(len(app.SOLEResultMatrix)-1):
+            for i in range(len(app.SOLEResultMatrix[0])-1):
                 header.append(f'a{i+1}')
             header.append('c')
             app.SOLEResultMatrix.insert(0, header)
@@ -841,8 +885,9 @@ def redrawGEStepsScreen(app, canvas):
     for i in range(1, len(app.GESteps)-1):
         canvas.create_text(app.width/2, 0.3*app.height + i*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[i]}',
     fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER)
-    canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[-1]}',
-    fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)} bold', justify=CENTER)
+    if len(app.GESteps) > 2:
+        canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.GEScrEntryTBRows/13*app.height + app.scrollY, text=f'{app.GESteps[-1]}',
+        fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)} bold', justify=CENTER)
     
 def redrawSOLEScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -870,7 +915,7 @@ def redrawSOLEResultScreen(app, canvas):
     drawBackButton(app, canvas)
 
     if app.SOLEResultState == 0:
-        canvas.create_text(app.width/2, 0.22*app.height, text="No solution",
+        canvas.create_text(app.width/2, 0.22*app.height, text="No solution. See REF matrix below:",
     fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/1.5)} bold', justify=CENTER)
     elif app.SOLEResultState == 1:
         canvas.create_text(app.width/2, 0.22*app.height, text="Unique solution",
@@ -890,16 +935,17 @@ def redrawSOLEStepsScreen(app, canvas):
         for i in range(0, len(app.SOLESteps)-1):
             canvas.create_text(app.width/2, 0.3*app.height + i*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[i]}',
             fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
+        # if len(app.SOLESteps) > 2:
         canvas.create_text(app.width/2, 0.3*app.height + (i+1)*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[-1]}',
             fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)} bold', justify=CENTER)
     
     else:
         for i in range(0, len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)):
-            canvas.create_text(app.width/2, 0.3*app.height + i*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, text=f'{app.SOLESteps[i]}',
+            canvas.create_text(app.width/2, 0.3*app.height + i*(app.SOLEScrEntryTBRows/15*app.height + 60) + app.scrollY, text=f'{app.SOLESteps[i]}',
             fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)}', justify=CENTER)
         for j in range(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1), len(app.SOLESteps)):
             canvas.create_text(app.width/2, 
-            0.3*app.height + (i+1)*app.SOLEScrEntryTBRows/15*app.height + (j-(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)))*app.SOLEScrEntryTBRows/15*app.height + app.scrollY, 
+            0.3*app.height + (i+1)*(app.SOLEScrEntryTBRows/15*app.height + 60) + (j-(len(app.SOLESteps)-(len(app.SOLEResultMatrix)-1)))*(app.SOLEScrEntryTBRows/15*app.height + 10) + app.scrollY, 
             text=f'{app.SOLESteps[j]}',
             fill='tan4', font=f'Century {int(app.SOLEScrTitleSize/2)} bold', justify=CENTER)
     

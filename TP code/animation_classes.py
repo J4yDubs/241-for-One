@@ -87,6 +87,20 @@ class DimTextBox(TextBox):
     def __init__(self, x0, y0, width, height, color, outline, fontSize, app):
         super().__init__(x0, y0, width, height, color, outline, fontSize, app)
         self.text = '3'     # pre-set dimension
+    
+    def keyPressed(self, app, eventKey):
+        # checks if length if eventKey is 1
+        if self.isSelected:
+            if len(self.text) == 0:
+                if eventKey in app.numKeys and eventKey != '0': # prevent div by 0 error
+                    self.text += eventKey
+                    return True
+            elif eventKey in app.numKeys:
+                self.text += eventKey
+                return True
+            elif eventKey == 'Backspace' or eventKey == 'Delete':
+                self.text = self.text[:-1]
+                return True
 
 class MatrixEntry():
     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):

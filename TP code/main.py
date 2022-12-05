@@ -27,9 +27,9 @@ def appStarted(app):
     app.scrollY = 0
 
     # app.textBoxes indices:
-    # 0: add, 1: mult, 2: tpose, 3: GE, 4: SOLE
+    # 0: add, 1: mult, 2: tpose, 3: GE, 4: SOLE, 5: det, 6: dirGraph
     # innermost list stores dimension Text Boxes
-    app.textBoxes = [[[]], [[],[]], [[]], [[]], [[]]]
+    app.textBoxes = [[[]], [[],[]], [[]], [[]], [[]], [[]], [[]]]
 
     # Screen initializations
     homeScreenInit(app)
@@ -39,6 +39,7 @@ def appStarted(app):
     tposeScreenInit(app)
     GEScreenInit(app)
     SOLEScreenInit(app)
+    detScreenInit(app)
 
 def keyPressed(app, event):
     if app.screen == 'matAdd':
@@ -53,7 +54,7 @@ def keyPressed(app, event):
         SOLEKeyPressed(app, event)
         
     # scrolling for screens
-    if app.screen == 'matMulSteps' or 'GESteps':   # extend to other steps screens
+    if app.screen == 'matMulSteps' or 'GESteps' or 'SOLESteps' or 'detSteps':   # extend to other steps screens
         scrollKeyPressed(app, event)
 
 def mouseMoved(app, event):
@@ -227,14 +228,15 @@ def redrawAll(app, canvas):
     elif app.screen == 'SOLESteps': 
         redrawSOLEStepsScreen(app, canvas)
 
+    elif app.screen == 'det': 
+        redrawDetScreen(app, canvas)
+
     elif app.screen == 'LU': 
         redrawLUScreen(app, canvas)
     elif app.screen == 'inverse': 
         redrawInverseScreen(app, canvas)
     elif app.screen == '4FS': 
         redraw4FSScreen(app, canvas)
-    elif app.screen == 'det': 
-        redrawDetScreen(app, canvas)
     elif app.screen == 'GS': 
         redrawGSScreen(app, canvas)
 
