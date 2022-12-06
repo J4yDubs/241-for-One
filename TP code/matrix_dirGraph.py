@@ -54,40 +54,40 @@ def getArrowsCoords(M, nodesCoords):
 
 # test animation below:
 
-def appStarted(app):
-    app.M = \
-    [
-    [0, 1, 1, 0, 0], 
-    [0, 0, 1, 0, 1],
-    [0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0]
+# def appStarted(app):
+#     app.M = \
+#     [
+#     [0, 1, 1, 0, 0], 
+#     [0, 0, 1, 0, 1],
+#     [0, 0, 0, 1, 0],
+#     [0, 0, 0, 0, 1],
+#     [0, 0, 0, 0, 0]
 
-        # [0, 1, 1, 1],
-        # [1, 0, 1, 1], 
-        # [1, 1, 0, 1],
-        # [1, 1, 1, 0]
+#         # [0, 1, 1, 1],
+#         # [1, 0, 1, 1], 
+#         # [1, 1, 0, 1],
+#         # [1, 1, 1, 0]
 
-        # [0, 1, 0, 1],
-        # [1, 0, 1, 0], 
-        # [0, 1, 0, 1],
-        # [1, 0, 1, 0]
-    ]
-    app.cx, app.cy = app.width/2, app.height/2
-    app.r = 0.8*app.cy
-    app.nodeR = 10
-    app.nodesCoords = getNodesCoords(app.cx, app.cy, app.r, app.M)
-    app.arrowsCoords = getArrowsCoords(app.M, app.nodesCoords)
+#         # [0, 1, 0, 1],
+#         # [1, 0, 1, 0], 
+#         # [0, 1, 0, 1],
+#         # [1, 0, 1, 0]
+#     ]
+#     app.cx, app.cy = app.width/2, app.height/2
+#     app.r = 0.8*app.cy
+#     app.nodeR = 10
+#     app.nodesCoords = getNodesCoords(app.cx, app.cy, app.r, app.M)
+#     app.arrowsCoords = getArrowsCoords(app.M, app.nodesCoords)
 
-def redrawAll(app, canvas):
-    for i in range(len(app.nodesCoords)):
-        x0, y0 = app.nodesCoords[i][0] - app.nodeR, app.nodesCoords[i][1] - app.nodeR 
-        x1, y1 = app.nodesCoords[i][0] + app.nodeR, app.nodesCoords[i][1] + app.nodeR
-        canvas.create_oval(x0, y0, x1, y1, fill='red')
-        canvas.create_text(app.nodesCoords[i][0], app.nodesCoords[i][1], 
-        text=f'{i+1}', fill='linen')
-    for i in range(len(app.arrowsCoords)):
-        x0, y0, x1, y1 = app.arrowsCoords[i]
-        canvas.create_line(x0, y0, x1, y1, arrow=tk.LAST)
+# def redrawAll(app, canvas):
+#     for i in range(len(app.nodesCoords)):
+#         x0, y0 = app.nodesCoords[i][0] - app.nodeR, app.nodesCoords[i][1] - app.nodeR 
+#         x1, y1 = app.nodesCoords[i][0] + app.nodeR, app.nodesCoords[i][1] + app.nodeR
+#         canvas.create_oval(x0, y0, x1, y1, fill='red')
+#         canvas.create_text(app.nodesCoords[i][0], app.nodesCoords[i][1], 
+#         text=f'{i+1}', fill='linen')
+#     for i in range(len(app.arrowsCoords)):
+#         x0, y0, x1, y1 = app.arrowsCoords[i]
+#         canvas.create_line(x0, y0, x1, y1, arrow=tk.LAST)
 
-runApp(title="matrix_dirGraph test")
+# runApp(title="matrix_dirGraph test")

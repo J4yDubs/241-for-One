@@ -2,6 +2,7 @@ from matrix_utils import *
 from matrix_GE import *
 from matrix_SOLE import *
 from matrix_det import *
+from matrix_dirGraph import *
 from cmu_112_graphics import *
 from animation_classes import *
 import tkinter as tk
@@ -76,59 +77,55 @@ def stepsButtonInit(app):
 def screensInit(app):
     app.screens = [ ['matCal',
      ['matAdd', 'matAddResult'],
-     ['matMul', 'matMulResult', 'matMulSteps'], 
-     ['matTpose', 'matTposeResult']], 
+     ['matMul', 'matMulResult', 'matMulSteps']],
+    ['matTpose', 'matTposeResult'], 
     ['GE', 'GEResult', 'GESteps'], 
     ['SOLE', 'SOLEResult', 'SOLESteps'],
-    ['det', 'detResult', 'detSteps'], ['inverse'], ['4FS'], ['LU'], ['GS'],
+    ['det', 'detResult', 'detSteps'], ['dirGraph', 'dirGraphResult'],
     ['home'] ]
     app.screen = app.screens[-1][0]
 
 # Home Screen Initialization
 def homeScreenInit(app):
     # button locations
-    app.homeMargin = app.width/8
-    app.homeScrButtonWidth = (0.75*app.width-0.75*app.homeMargin)/4
+    app.homeMargin = app.width/6
+    app.homeScrButtonWidth = (0.66*app.width-0.66*app.homeMargin)/3
     app.homeScrButtonHeight = 0.4*app.homeScrButtonWidth
     # font sizes
     app.homeScrTitleSize = int(app.height/15)
     # app.homeButtonsText format: [(text, font size)]
     app.homeButtonsText = [
-        ('General Matrix\nCalculator', int(app.homeScrTitleSize/3)), 
+        ('General Matrix\nCalculator', int(app.homeScrTitleSize/3)),
+        ('Obtain\nTranspose', int(app.homeScrTitleSize/3)),
         ('Gaussian\nElimination', int(app.homeScrTitleSize/3)),
         ('Solving Systems of\nLinear Equations', int(app.homeScrTitleSize/3.3)),
         ('Determinant', int(app.homeScrTitleSize/3)),   
-        ('Inverse', int(app.homeScrTitleSize/3)),
-        ('4 Fundamental\nSubspaces', int(app.homeScrTitleSize/3)), 
-        ('LU-Factorization', int(app.homeScrTitleSize/3)),
-        ('Orthonormal\nBases', int(app.homeScrTitleSize/3)),
+        ('Directed Graphs', int(app.homeScrTitleSize/3)),
         ]
     # creating home buttons with button object
-    for i in range(8):
-        app.buttons[0].append(button(int( app.homeMargin + (i%4)*(app.homeScrButtonWidth + app.homeMargin/4) ),
-                                0.5*app.height + (i//4)*(app.homeMargin/4 + app.homeScrButtonHeight),
+    for i in range(len(app.homeButtonsText)):
+        app.buttons[0].append(button(int( app.homeMargin + (i%3)*(app.homeScrButtonWidth + app.homeMargin/3) ),
+                                0.5*app.height + (i//3)*(app.homeMargin/4 + app.homeScrButtonHeight),
                                 app.homeScrButtonWidth, app.homeScrButtonHeight,
                                 'tan4', app.homeButtonsText[i][0], app.homeButtonsText[i][1], '', ''))
 
 # General matrix calculator screen initialization
 def calScreenInit(app):
     # button locations
-    app.calMargin = app.width/7
-    app.calScrButtonWidth = (0.75*app.width-0.2*app.calMargin)/4
+    app.calScrButtonWidth = app.homeScrButtonWidth
     app.calScrButtonHeight = 0.4*app.calScrButtonWidth
-    app.calScrButtonSep = (app.width-2*app.calMargin-3*app.calScrButtonWidth)//2
+    app.calScrButtonSep = 0.5*app.calScrButtonHeight
     # font sizes
     app.calScrTitleSize = int(app.height/17)
     # button text
     app.calButtonsText = [
         ('Matrix\nAddition', int(app.calScrTitleSize/2.5)), 
-        ('Matrix\nMultiplication', int(app.calScrTitleSize/2.5)),
-        ('Obtain\nTranspose', int(app.calScrTitleSize/2.5)), 
+        ('Matrix\nMultiplication', int(app.calScrTitleSize/2.5)), 
         ]
     # creating buttons with button object
     for i in range(len(app.calButtonsText)):
-        app.buttons[1].append(button(int( app.calMargin + i*(app.calScrButtonWidth + app.calScrButtonSep) ),
-                                0.5*app.height,
+        app.buttons[1].append(button(app.width//2-app.calScrButtonWidth//2,
+                                0.45*app.height + i*(app.calScrButtonHeight + app.calScrButtonSep),
                                 app.calScrButtonWidth, app.calScrButtonHeight,
                                 'tan4', app.calButtonsText[i][0], app.calButtonsText[i][1], '', ''))
 
@@ -414,6 +411,52 @@ def detScreenInit(app):
     # *** DET STEPS SCREEN ***
     app.detSteps = [] 
 
+# Directed Graph screen and its sub-screens initializations
+def dirGraphScreenInit(app):
+    # *** DIRGRAPH SCREEN ***
+    # text box margins
+    app.dirGraphMargin = app.width/2.5
+    # font sizes
+    app.dirGraphScrTitleSize = int(app.height/23)
+    # Text Box Dims
+    # i) dimension text box (only 1 as square matrix required)
+    app.dirGraphScrDimTBWidth = 0.05*app.width
+    app.dirGraphScrDimTBHeight = app.dirGraphScrDimTBWidth
+    # app.detScrDimTBSep = (app.width-2*app.detMargin-2*app.detScrDimTBWidth)
+    app.textBoxes[6][0].append(DimTextBox(int( app.width/2 - app.dirGraphScrDimTBWidth/2 ),
+        0.14*app.height, 
+        app.dirGraphScrDimTBWidth, app.dirGraphScrDimTBHeight, 
+        'peach puff', 'tan4', app.dirGraphScrDimTBHeight/2, app))
+    # ii) entry text boxes
+    app.dirGraphScrEntryTBX0 = app.width/10
+    app.dirGraphScrEntryTBY0 = 0.27*app.height
+    app.dirGraphScrEntryTBX1 = app.width/2-app.dirGraphScrEntryTBX0
+    app.dirGraphScrEntryTBY1 = app.dirGraphScrEntryTBY0 + (app.dirGraphScrEntryTBX1 - app.dirGraphScrEntryTBX0) # square
+    app.dirGraphScrEntryTBWidth = app.dirGraphScrEntryTBX1 - app.dirGraphScrEntryTBX0
+    app.dirGraphScrEntryTBHeight = app.dirGraphScrEntryTBY1 - app.dirGraphScrEntryTBY0
+    app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols = int(app.textBoxes[6][0][0].text), int(app.textBoxes[6][0][0].text)
+    app.dirGraphScrEntryFontSize = min((app.dirGraphScrEntryTBHeight)/(2*app.dirGraphScrEntryTBRows),
+    (app.dirGraphScrEntryTBWidth)/(2*app.dirGraphScrEntryTBCols))
+    app.textBoxes[6].append(MatrixEntry( app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols, 
+    app.width/2 - app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY0, 
+    app.width/2 + app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY1, 
+    'peach puff', 'tan4', app.dirGraphScrEntryFontSize, app))
+
+    # *** DIRGRAPH RESULT SCREEN ***
+    app.cx, app.cy = app.width/2, app.height/2
+    app.noderadialR = 0.6*app.cy
+    app.nodeR = app.height/20   # node radius
+    app.nodesCoords = None
+    app.arrowsCoords = None
+    # app.detResultX0 = app.width/2.85
+    # app.detResultY0 = app.height/5
+    # app.detResultX1 = app.width - app.detResultX0
+    # app.detResultY1 = app.detResultY0 + (app.detResultX1 - app.detResultX0)
+    # app.detResultMatrix = create2DList(app.detScrEntryTBRows, app.detScrEntryTBCols)
+    # app.detResult = OutputMatrix(app.detResultMatrix, app.detResultX0, app.detResultY0, 
+    # app.detResultX1, app.detResultY1, 'peach puff', 'tan4', app.detScrEntryFontSize, app)
+    # app.detValue = None
+
 # *****************************************************************
 # ********************* KEYPRESSED FUNCTIONS **********************
 # *****************************************************************
@@ -550,6 +593,21 @@ def detKeyPressed(app, event):
         app.detResultMatrix = create2DList(app.detScrEntryTBRows, app.detScrEntryTBCols)
     app.textBoxes[5][1].keyPressed(app, event.key)
 
+def dirGraphKeyPressed(app, event):
+    if app.textBoxes[6][0][0].keyPressed(app, event.key):
+        if app.textBoxes[6][0][0].text != '':
+            app.dirGraphScrEntryTBRows = int(app.textBoxes[6][0][0].text)
+            app.dirGraphScrEntryFontSize = min((app.dirGraphScrEntryTBHeight)/(2*app.dirGraphScrEntryTBRows),
+            (app.dirGraphScrEntryTBWidth)/(2*app.dirGraphScrEntryTBCols))
+            app.dirGraphScrEntryTBCols = int(app.textBoxes[6][0][0].text)
+            app.dirGraphScrEntryFontSize = min((app.dirGraphScrEntryTBHeight)/(2*app.dirGraphScrEntryTBRows),
+            (app.dirGraphScrEntryTBWidth)/(2*app.dirGraphScrEntryTBCols))
+        app.textBoxes[6][1] = MatrixEntry( app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols, 
+                app.width/2 - app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY0, 
+                app.width/2 + app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY1, 
+                'peach puff', 'tan4', app.dirGraphScrEntryFontSize, app)
+    app.textBoxes[6][1].keyPressed(app, event.key)
+
 # Scrolling keyPressed
 def scrollKeyPressed(app, event):
     if event.key in app.scrollKeys:
@@ -620,8 +678,6 @@ def matMulMousePressed(app, event):
 
 # Transpose mousePressed
 def tposeMousePressed(app, event):
-    if app.backButton.mousePressed(app, event.x, event.y):
-        app.screen = 'matCal'
     for i in range(len(app.textBoxes[2][0])):
         app.textBoxes[2][0][i].mousePressed(app, event.x, event.y)
     app.textBoxes[2][1].mousePressed(app, event.x, event.y)
@@ -710,6 +766,7 @@ def SOLEMousePressed(app, event):
     if app.clearButton.mousePressed(app, event.x, event.y):
         app.textBoxes[4][1].clear()
 
+# Determinant mousePressed
 def detMousePressed(app, event):
     app.textBoxes[5][0][0].mousePressed(app, event.x, event.y)
     app.textBoxes[5][1].mousePressed(app, event.x, event.y)
@@ -733,6 +790,41 @@ def detMousePressed(app, event):
     if app.clearButton.mousePressed(app, event.x, event.y):
         app.textBoxes[5][1].clear()
 
+# Directed Graph mousePressed
+def dirGraphMousePressed(app, event):
+    app.textBoxes[6][0][0].mousePressed(app, event.x, event.y)
+    app.textBoxes[6][1].mousePressed(app, event.x, event.y)
+
+    # Solving here
+    if app.solveButton.mousePressed(app, event.x, event.y) \
+    and app.textBoxes[6][1].isFilled():
+        M = app.textBoxes[6][1].matrix()
+        # M = \
+        # [
+
+        # [0, 1, 1, 0, 0], 
+        # [0, 0, 1, 0, 1],
+        # [0, 0, 0, 1, 0],
+        # [0, 0, 0, 0, 1],
+        # [0, 0, 0, 0, 0]]
+
+            # [0, 1, 1, 1],
+            # [1, 0, 1, 1], 
+            # [1, 1, 0, 1],
+            # [1, 1, 1, 0]]
+
+            # [0, 1, 0, 1],
+            # [1, 0, 1, 0], 
+            # [0, 1, 0, 1],
+            # [1, 0, 1, 0]]
+        app.nodesCoords = getNodesCoords(app.cx, app.cy, app.noderadialR, M)
+        app.arrowsCoords = getArrowsCoords(M, app.nodesCoords)
+        app.screen = 'dirGraphResult'
+
+    # Clearing here
+    if app.clearButton.mousePressed(app, event.x, event.y):
+        app.textBoxes[6][1].clear()
+
 # *****************************************************************
 # ******************** REDRAW BUTTON FUNCTIONS ********************
 # *****************************************************************
@@ -753,9 +845,17 @@ def drawBackButton(app, canvas):
 
 def drawSolveButton(app, canvas):
     app.solveButton.redraw(app, canvas)
+    canvas.create_text(mean(app.solveButton.x0, app.solveButton.x1), 
+    mean(app.solveButton.y0, app.solveButton.y1),
+    text="["+ " "*(int(app.solveButtonWidth/23)) +"]", fill=app.solveButton.bracketColor, 
+    font=f'Century {int(app.solveButton.fontSize*3.7)}', justify=CENTER)
 
 def drawClearButton(app, canvas):
     app.clearButton.redraw(app, canvas)
+    canvas.create_text(mean(app.clearButton.x0, app.clearButton.x1), 
+    mean(app.clearButton.y0, app.clearButton.y1),
+    text="["+ " "*(int(app.clearButtonWidth/23)) +"]", fill=app.clearButton.bracketColor, 
+    font=f'Century {int(app.clearButton.fontSize*3.7)}', justify=CENTER)
 
 def drawStepsButton(app, canvas):
     app.stepsButton.redraw(app, canvas)
@@ -765,27 +865,23 @@ def drawStepsButton(app, canvas):
 # *****************************************************************
 
 def redrawHomeScreen(app, canvas):
-    canvas.create_text(app.width/2, 0.13*app.height, text="241-for-One",
+    canvas.create_text(app.width/2, 0.20*app.height, text="241-for-One",
     fill='tan4', font=f'Century {app.homeScrTitleSize} bold', justify=CENTER)
     # canvas.create_text(app.width/2, 0.13*app.height, text="(           )",
     # fill='tan4', font=f'Century {app.homeScrTitleSize*2} bold')
-    canvas.create_text(app.width/2, mean(0.15*app.height, app.buttons[0][0].y0), 
-    text='''
-    <Insert app description here> 
-    
-    Now start by choosing one of the functions below!
-    ''',
-    fill='tan4', font=f'Century {int(app.homeScrTitleSize/3)}', justify=CENTER)
+    canvas.create_text(app.width/2, mean(0.1*app.height, app.buttons[0][0].y0), 
+    text='A 21-241 companion app',
+    fill='tan4', font=f'Century {int(app.homeScrTitleSize/2.5)}', justify=CENTER)
     canvas.create_text(app.width/2, mean(app.buttons[0][0].y0, app.buttons[0][4].y1), 
-    text="["+ " "*(int(app.homeScrTitleSize/5)) +"]", # makes this dynamically resize
-    fill='tan4', font=f'Century {app.homeScrTitleSize*5}')
+    text="["+ " "*(int(app.homeScrTitleSize/6)) +"]", # makes this dynamically resize
+    fill='tan4', font=f'Century {int(app.homeScrTitleSize*5.3)}')
 
     for i in range(len(app.buttons[0])):
         app.buttons[0][i].redraw(app, canvas)
         canvas.create_text(mean(app.buttons[0][i].x0, app.buttons[0][i].x1),
         mean(app.buttons[0][i].y0, app.buttons[0][i].y1), 
-        text="["+ " "*(int(app.homeScrButtonWidth/42)) +"]", # makes this dynamically resize
-        fill=app.buttons[0][i].bracketColor, font=f'Century {app.homeScrTitleSize*2}', 
+        text="["+ " "*(int(app.homeScrButtonWidth/39)) +"]", # makes this dynamically resize
+        fill=app.buttons[0][i].bracketColor, font=f'Century {int(app.homeScrTitleSize*1.8)}', 
         justify=CENTER)
 
 def redrawMatCalScreen(app, canvas):
@@ -793,8 +889,17 @@ def redrawMatCalScreen(app, canvas):
     canvas.create_text(app.width/2, 0.25*app.height, text="General Matrix\nCalculator",
     fill='tan4', font=f'Century {app.calScrTitleSize} bold', justify=CENTER)
 
+    canvas.create_text(app.width/2, mean(app.buttons[1][0].y0, app.buttons[1][1].y1), 
+    text="["+ " "*(int(app.calScrTitleSize/15)) +"]", # makes this dynamically resize
+    fill='tan4', font=f'Century {int(app.calScrTitleSize*5.5)}')
+
     for i in range(len(app.buttons[1])):
         app.buttons[1][i].redraw(app, canvas)
+        canvas.create_text(mean(app.buttons[1][i].x0, app.buttons[1][i].x1),
+        mean(app.buttons[1][i].y0, app.buttons[1][i].y1), 
+        text="["+ " "*(int(app.calScrButtonWidth/39)) +"]", # makes this dynamically resize
+        fill=app.buttons[1][i].bracketColor, font=f'Century {app.calScrTitleSize*2}', 
+        justify=CENTER)
 
 def redrawMatAddScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -869,7 +974,6 @@ def redrawMatMulStepsScreen(app, canvas):
 
 def redrawMatTposeScreen(app, canvas):
     drawBackHomeButton(app, canvas)
-    drawBackButton(app, canvas)
     drawSolveButton(app, canvas)
     drawClearButton(app, canvas)
     canvas.create_text(app.width/2, 0.05*app.height, text="Obtain Transpose",
@@ -999,14 +1103,56 @@ def redrawDetStepsScreen(app, canvas):
     canvas.create_text(app.width/2, 0.2*app.height + app.scrollY, text=f'{app.detSteps}', 
     fill='tan4', font=f'Century {int(app.GEScrTitleSize/2)}', justify=CENTER, anchor=tk.N)
 
-def redrawLUScreen(app, canvas):
+def redrawDirGraphScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawSolveButton(app, canvas)
+    drawClearButton(app, canvas)
+    canvas.create_text(app.width/2, 0.07*app.height, text="Generate Directed Graph",
+    fill='tan4', font=f'Century {app.dirGraphScrTitleSize} bold', justify=CENTER)
+    app.textBoxes[6][0][0].redraw(app, canvas)
+    canvas.create_text(app.width/2, 0.25*app.height, text='rows and cols each', fill='tan4', 
+    font=f'Century {int(app.dirGraphScrTitleSize/2)}', justify=CENTER)
+    app.textBoxes[6][1].redraw(app, canvas)
 
-def redrawInverseScreen(app, canvas):
+def redrawDirGraphResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
+    drawBackButton(app, canvas)
+    canvas.create_text(app.width/2, 0.07*app.height, text="Directed Graph Generated:",
+    fill='tan4', font=f'Century {app.dirGraphScrTitleSize} bold', justify=CENTER)
+    for i in range(len(app.nodesCoords)):
+        x0, y0 = app.nodesCoords[i][0] - app.nodeR, app.nodesCoords[i][1] - app.nodeR 
+        x1, y1 = app.nodesCoords[i][0] + app.nodeR, app.nodesCoords[i][1] + app.nodeR
+        canvas.create_oval(x0, y0, x1, y1, fill='tan3', outline=None)
+        canvas.create_text(app.nodesCoords[i][0], app.nodesCoords[i][1], 
+        text=f'{i+1}', font=f'Century {int(app.nodeR)} bold', fill='linen')
+    for i in range(len(app.arrowsCoords)):
+        x0, y0, x1, y1 = app.arrowsCoords[i]
+        canvas.create_line(x0, y0, x1, y1,
+                            width=3, fill='tan4', arrow=tk.LAST)
+        
+        # if x0 == x1:    # prevent div by 0 error
+        #     if y0-y1 > 0: theta = -0.5*math.pi
+        #     else: theta = 0.5*math.pi
+        # else: theta = math.atan((y0-y1)/(x1-x0))
+        
+        # newX0, newY0, newX1, newY1 = 0, 0, 0, 0
+        # if x1-x0 < 0:
+        #     newX0 = x0 - app.nodeR*math.cos(theta)
+        #     newX1 = x1 + app.nodeR*math.cos(theta)
+        # else: 
+        #     newX0 = x0 + app.nodeR*math.cos(theta)
+        #     newX1 = x1 - app.nodeR*math.cos(theta)
+        
+        # if y1-y0 < 0:
+        #     newY0 = y0 - app.nodeR*math.sin(0.5*math.pi + theta)
+        #     newY1 = y1 + app.nodeR*math.sin(0.5*math.pi + theta)
+        # else: 
+        #     newY0 = y0 + app.nodeR*math.sin(theta)
+        #     newY1 = y1 - app.nodeR*math.sin(theta)
 
-def redraw4FSScreen(app, canvas):
-    drawBackHomeButton(app, canvas)
+        # if x1-x0 == 0:  # if perfectly vertical
+        #     newY0 = y0 + app.nodeR*math.sin(theta)
+        #     newY1 = y1 - app.nodeR*math.sin(theta)
 
-def redrawGSScreen(app, canvas):
-    drawBackHomeButton(app, canvas)
+        # canvas.create_line(newX0, newY0, newX1, newY1,
+        #                     width=3, arrow=tk.LAST)

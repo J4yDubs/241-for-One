@@ -10,8 +10,8 @@ def appStarted(app):
     screensInit(app)
 
     # app.buttons indices:
-    # 0: home, 1: calc, 2: add, 3: mult, 4: tpose
-    app.buttons = [[],[],[],[],[],[],[]]
+    # 0: home, 1: calc
+    app.buttons = [[],[]]
     backHomeButtonInit(app)
     backButtonInit(app)
     solveButtonInit(app)
@@ -40,6 +40,7 @@ def appStarted(app):
     GEScreenInit(app)
     SOLEScreenInit(app)
     detScreenInit(app)
+    dirGraphScreenInit(app)
 
 def keyPressed(app, event):
     if app.screen == 'matAdd':
@@ -54,6 +55,8 @@ def keyPressed(app, event):
         SOLEKeyPressed(app, event)
     elif app.screen == 'det':
         detKeyPressed(app, event)
+    elif app.screen == 'dirGraph':
+        dirGraphKeyPressed(app, event)
         
     # scrolling for screens
     if app.screen == 'matMulSteps' or 'GESteps' or 'SOLESteps' or 'detSteps':   # extend to other steps screens
@@ -130,6 +133,12 @@ def mouseMoved(app, event):
 
         elif app.screen == 'detResult':
             app.stepsButton.mouseMoved(app, event.x, event.y)
+        
+        elif app.screen == 'dirGraph':
+            app.solveButton.mouseMoved(app, event.x, event.y)
+            app.clearButton.mouseMoved(app, event.x, event.y)
+            app.textBoxes[6][0][0].mouseMoved(app, event.x, event.y)
+            app.textBoxes[6][1].mouseMoved(app, event.x, event.y)
         
     
 def mousePressed(app, event):
@@ -213,6 +222,15 @@ def mousePressed(app, event):
             if app.backButton.mousePressed(app, event.x, event.y):
                 app.screen = 'detResult'
         
+        # For dirGraph and its sub-screens
+        elif app.screen == 'dirGraph':
+            dirGraphMousePressed(app, event)
+        elif app.screen == 'dirGraphResult':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'dirGraph'
+        elif app.screen == 'detSteps':
+            if app.backButton.mousePressed(app, event.x, event.y):
+                app.screen = 'dirGraphResult'
 
 def redrawAll(app, canvas):
     canvas.create_rectangle(0, 0, app.width, app.height, width=0, fill='linen')
@@ -259,14 +277,10 @@ def redrawAll(app, canvas):
     elif app.screen == 'detSteps':
         redrawDetStepsScreen(app, canvas)
 
-    elif app.screen == 'LU': 
-        redrawLUScreen(app, canvas)
-    elif app.screen == 'inverse': 
-        redrawInverseScreen(app, canvas)
-    elif app.screen == '4FS': 
-        redraw4FSScreen(app, canvas)
-    elif app.screen == 'GS': 
-        redrawGSScreen(app, canvas)
+    elif app.screen == 'dirGraph':
+        redrawDirGraphScreen(app, canvas)
+    elif app.screen == 'dirGraphResult':
+        redrawDirGraphResultScreen(app, canvas)
 
 def run241ForOne():
     runApp(title="241-for-One")
