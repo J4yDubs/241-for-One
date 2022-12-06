@@ -1127,32 +1127,38 @@ def redrawDirGraphResultScreen(app, canvas):
         text=f'{i+1}', font=f'Century {int(app.nodeR)} bold', fill='linen')
     for i in range(len(app.arrowsCoords)):
         x0, y0, x1, y1 = app.arrowsCoords[i]
-        canvas.create_line(x0, y0, x1, y1,
+        newX0, newY0, newX1, newY1 = 0, 0, 0, 0
+        if x0 == x1:
+            if y0 > y1: theta = 0.5*math.pi
+            else: theta = -0.5*math.pi
+        else:
+            theta = abs(math.atan((y0-y1)/(x1-x0)))
+
+        if x1 > x0:
+            newX0 = x0 + app.nodeR*math.cos(theta)
+            newX1 = x1 - app.nodeR*math.cos(theta)
+        else: 
+            newX0 = x0 - app.nodeR*math.cos(theta)
+            newX1 = x1 + app.nodeR*math.cos(theta)
+        
+        if y1 < y0:
+                newY0 = y0 - app.nodeR*math.sin(theta)
+                newY1 = y1 + app.nodeR*math.sin(theta)
+        else: 
+            newY0 = y0 + app.nodeR*math.sin(theta)
+            newY1 = y1 - app.nodeR*math.sin(theta)
+
+        if x1 == x0:
+            newX0, newX1 = x0, x1
+            if y0 > y1:
+                newY0 = y0 - app.nodeR
+                newY1 = y1 + app.nodeR
+            else:
+                newY0 = y0 + app.nodeR
+                newY1 = y1 - app.nodeR
+
+        elif y1 == y0:
+            newY0, newY1 = y0, y1
+        
+        canvas.create_line(newX0, newY0, newX1, newY1,
                             width=3, fill='tan4', arrow=tk.LAST)
-        
-        # if x0 == x1:    # prevent div by 0 error
-        #     if y0-y1 > 0: theta = -0.5*math.pi
-        #     else: theta = 0.5*math.pi
-        # else: theta = math.atan((y0-y1)/(x1-x0))
-        
-        # newX0, newY0, newX1, newY1 = 0, 0, 0, 0
-        # if x1-x0 < 0:
-        #     newX0 = x0 - app.nodeR*math.cos(theta)
-        #     newX1 = x1 + app.nodeR*math.cos(theta)
-        # else: 
-        #     newX0 = x0 + app.nodeR*math.cos(theta)
-        #     newX1 = x1 - app.nodeR*math.cos(theta)
-        
-        # if y1-y0 < 0:
-        #     newY0 = y0 - app.nodeR*math.sin(0.5*math.pi + theta)
-        #     newY1 = y1 + app.nodeR*math.sin(0.5*math.pi + theta)
-        # else: 
-        #     newY0 = y0 + app.nodeR*math.sin(theta)
-        #     newY1 = y1 - app.nodeR*math.sin(theta)
-
-        # if x1-x0 == 0:  # if perfectly vertical
-        #     newY0 = y0 + app.nodeR*math.sin(theta)
-        #     newY1 = y1 - app.nodeR*math.sin(theta)
-
-        # canvas.create_line(newX0, newY0, newX1, newY1,
-        #                     width=3, arrow=tk.LAST)
