@@ -507,9 +507,6 @@ def matMulKeyPressed(app, event):
                 app.mulScrEntryTBX0, app.mulScrEntryTBY0, 
                 app.mulScrEntryTBX1, app.mulScrEntryTBY1, 
                 'peach puff', 'tan4', app.mulScrEntry1FontSize, app)
-            # if app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text:  # Dim error message display
-            #     app.mulDimError = False
-            # else: app.mulDimError = True
 
     for i in range(len(app.textBoxes[1][1])):
         if app.textBoxes[1][1][i].keyPressed(app, event.key):
