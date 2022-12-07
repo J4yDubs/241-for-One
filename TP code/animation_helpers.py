@@ -440,7 +440,7 @@ def dirGraphScreenInit(app):
     app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols = int(app.textBoxes[6][0][0].text), int(app.textBoxes[6][0][0].text)
     app.dirGraphScrEntryFontSize = min((app.dirGraphScrEntryTBHeight)/(2*app.dirGraphScrEntryTBRows),
     (app.dirGraphScrEntryTBWidth)/(2*app.dirGraphScrEntryTBCols))
-    app.textBoxes[6].append(MatrixEntry( app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols, 
+    app.textBoxes[6].append(AdjMatEntryTextBox( app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols, 
     app.width/2 - app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY0, 
     app.width/2 + app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY1, 
     'peach puff', 'tan4', app.dirGraphScrEntryFontSize, app))
@@ -609,7 +609,7 @@ def dirGraphKeyPressed(app, event):
             app.dirGraphScrEntryTBCols = int(app.textBoxes[6][0][0].text)
             app.dirGraphScrEntryFontSize = min((app.dirGraphScrEntryTBHeight)/(2*app.dirGraphScrEntryTBRows),
             (app.dirGraphScrEntryTBWidth)/(2*app.dirGraphScrEntryTBCols))
-        app.textBoxes[6][1] = MatrixEntry( app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols, 
+        app.textBoxes[6][1] = AdjMatEntryTextBox( app.dirGraphScrEntryTBRows, app.dirGraphScrEntryTBCols, 
                 app.width/2 - app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY0, 
                 app.width/2 + app.dirGraphScrEntryTBWidth/2, app.dirGraphScrEntryTBY1, 
                 'peach puff', 'tan4', app.dirGraphScrEntryFontSize, app)

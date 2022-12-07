@@ -278,4 +278,33 @@ class AMEntryTextBox(MatrixEntry):
         for i in range(self.rows):
             self.baseColors[i][-1] = self.constColColor
 
+# textbox for adjacency matrix
+class AdjMatEntryTextBox(MatrixEntry):
+    def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
+        super().__init__(rows, cols, x0, y0, x1, y1, color, outline, fontSize, app)
+    
+    # modified to only take '1' or '0' as entries
+    def keyPressed(self, app, eventKey):
+        # checks if length if eventKey is 1
+        count = 0   # to prevent infinite loop in entry selection
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.isSelected[i][j] and count==0:
+                    if eventKey == '0' or  eventKey == '1':
+                        self.text[i][j] += eventKey
+                    elif eventKey == 'Backspace' or eventKey == 'Delete':
+                        self.text[i][j] = self.text[i][j][:-1]
+                    elif eventKey in app.entryNavKeys:
+                        self.color[i][j] = self.baseColors[i][j]
+                        self.isSelected[i][j] = False
+                        if (eventKey == 'Up' and i>0) \
+                            or (eventKey == 'Down' and i<(self.rows-1)):
+                            self.color[i+app.entryNavKeys[eventKey]][j] = 'tan1'
+                            self.isSelected[i+app.entryNavKeys[eventKey]][j] = True
+                        elif (eventKey == 'Left' and j>0) \
+                            or (eventKey == 'Right' and j<(self.cols-1)):
+                            self.color[i][j+app.entryNavKeys[eventKey]] = 'tan1'
+                            self.isSelected[i][j+app.entryNavKeys[eventKey]] = True
+                        count += 1
+
 # Create header class
