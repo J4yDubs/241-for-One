@@ -36,7 +36,8 @@ def getArrowsCoords(M, nodesCoords):
     arrowCoords = []
     for row in range(rows):
         for col in range(cols):
-            if M[row][col] != 0: arrowCoords.append((nodesCoords[row][0], nodesCoords[row][1], 
+            if M[row][col] != 0 and row != col: 
+                arrowCoords.append((nodesCoords[row][0], nodesCoords[row][1], 
                                                     nodesCoords[col][0], nodesCoords[col][1]))
     return arrowCoords
 
