@@ -1,5 +1,3 @@
-import math
-
 from matrix_GE import *
 
 # SOLE = System of Linear Equations
@@ -13,24 +11,19 @@ def isAllZero(rowVector):
             return False
     return True
 
+# checks if a given system of equations is consistent
 def isConsistent(refM):
-    rows, cols = len(refM), len(refM[0])
-    # if refM[rows-1][cols-1] == 0:
-    #     return True
-    # for col in range(cols-1):
-    #     if refM[rows-1][col] != 0:
-    #         return True
-    # return False
+    rows = len(refM)
     for row in range(rows):
         rowVector = refM[row][:-1]
         if isAllZero(rowVector) and refM[row][-1] != 0:
             return False
     return True
 
+# Solving System of Linear Equations (SOLE) function
 def SOLE(inputM):
     rows, cols = len(inputM), len(inputM[0])
     refM = GE(inputM)
-    # print(refM)     #*
 
     # Case 1: No solutions (checks last row if all 0s but has non-zero constant term)
     if not isConsistent(refM):
@@ -46,8 +39,6 @@ def SOLE(inputM):
     for col in range(cols-1):
         if col not in pivots:
             freeVars.append(col)
-
-    # print(pivots, freeVars) #*
     
     # Case 2: Unique solution; no free variables (freeVars)
     if len(freeVars) == 0:
@@ -58,7 +49,6 @@ def SOLE(inputM):
             for xCol in range(cols-2, col,-1):
                 constant -= x[xCol]*refM[col][xCol]
             x[col] = constant/refM[col][col]
-        # return x
         return roundOffEntries(x)
     
     # Case 3: Special solutions
@@ -74,9 +64,9 @@ def SOLE(inputM):
             for xCol in range(cols-2, pivots[pivotIndex],-1):
                 constant -= xRow[xCol]*refM[pivots[pivotIndex]][xCol]
             xRow[pivots[pivotIndex]] = constant/refM[pivots[pivotIndex]][pivots[pivotIndex]]
-    # return x
     return roundOffEntries(x)
 
+# Solving System of Linear Equations (SOLE) function (with steps)
 def SOLEWithSteps(inputM):
     rows, cols = len(inputM), len(inputM[0])
     refM = GE(inputM)
@@ -101,8 +91,6 @@ def SOLEWithSteps(inputM):
     for col in range(cols-1):
         if col not in pivots:
             freeVars.append(col)
-
-    # print(pivots, freeVars) #*
     
     # Case 2: Unique solution; no free variables (freeVars)
     if len(freeVars) == 0:
@@ -211,9 +199,3 @@ def SOLEWithSteps(inputM):
 
 # M = [[0, 7, 5, 3, 4], [1, 2, 4, 2, 4], [1, 2, 2, 8, 4]]
 # print(GEWithSteps(M))
-
-'''
-Proposed Improvements:
-- Store row operations in there to apply to constant on right?
-- Detect is system is inconsistent (no solutions)
-'''

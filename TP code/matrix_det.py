@@ -26,6 +26,7 @@ def detCofactor(M):
         det += M[0][j-1]*detCofactor(newM)*((-1)**(1+j))
     return det
 
+# determinant via cofactor method main function (with steps displayed)
 def detCofacWithSteps(M):
     steps = []
     if len(M) == 1: # for 1x1 matrices
@@ -38,6 +39,7 @@ def detCofacWithSteps(M):
     print(concatSteps(steps))
     return (det, concatSteps(steps))
 
+# determinant via cofactor method helper function (with steps displayed)
 def detCofacWithStepsHelper(M, steps, depth=0):
     # stepCount += 1
     rows, cols = len(M), len(M[0])
@@ -51,6 +53,7 @@ def detCofacWithStepsHelper(M, steps, depth=0):
     steps.append(f'Depth {depth}:\n{matToDetStr(M)}\n= ')
     for j in range(1, cols+1):
         steps[-1] += (f'(-1)^({1+j})×({M[0][j-1]})×|M{1}{j}|+\n')
+    # step below generates sub-matrix with ith and jth column removed
     for j in range(1, cols+1):
         newM = create2DList(rows-1, cols-1)
         for i in range(1, rows):

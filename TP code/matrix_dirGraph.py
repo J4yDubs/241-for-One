@@ -1,7 +1,7 @@
 import math
 from matrix_utils import *
 from cmu_112_graphics import *
-import tkinter as tk
+# import tkinter as tk
 
 # returns node with most edges for them to be placed in the center
 # if there are multiple nodes, it returns the first max node
@@ -41,19 +41,9 @@ def getArrowsCoords(M, nodesCoords):
                                                     nodesCoords[col][0], nodesCoords[col][1]))
     return arrowCoords
 
-# directed matrix below
-# M =\
-#     [
-#     [0, 1, 1, 0, 0], 
-#     [0, 0, 1, 0, 1],
-#     [0, 0, 0, 1, 0],
-#     [0, 0, 0, 0, 1],
-#     [0, 0, 0, 0, 0],
-#     ]
-# print(mostEdges(M))
 
 
-# test animation below:
+## test animation below (uncomment import tkinter as tk above):
 
 # def appStarted(app):
 #     app.M = \

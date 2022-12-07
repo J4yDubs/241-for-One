@@ -623,9 +623,6 @@ def scrollKeyPressed(app, event):
                     app.scrollY += app.scrollKeys[event.key]
             else: app.scrollY += app.scrollKeys[event.key]
 
-# *****************************************************************
-# ********************* MOUSEMOVED FUNCTIONS **********************
-# *****************************************************************
 
 # *****************************************************************
 # ********************* MOUSE PRESSED FUNCTIONS ********************
@@ -671,7 +668,6 @@ def matMulMousePressed(app, event):
     and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
     and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
         M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
-        # M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
         app.mulResultMatrix, app.mulSteps = matMulWithSteps(M1, M2)
         app.mulResult = OutputMatrix(app.mulResultMatrix, app.mulResultX0, app.mulResultY0, 
         app.mulResultX1, app.mulResultY1, 'peach puff', 'tan4', 
@@ -693,7 +689,6 @@ def tposeMousePressed(app, event):
     if app.solveButton.mousePressed(app, event.x, event.y)\
     and app.textBoxes[2][1].isFilled():
         M = app.textBoxes[2][1].matrix()
-        # M = [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
         app.tposeResultMatrix = matTpose(M)
         app.tposeResult = OutputMatrix(app.tposeResultMatrix, app.tposeResultX0, app.tposeResultY0, 
                 app.tposeResultX1, app.tposeResultY1, 'peach puff', 'tan4', app.tposeScrEntryFontSize/2, app)
@@ -713,7 +708,6 @@ def GEMousePressed(app, event):
     if app.solveButton.mousePressed(app, event.x, event.y)\
     and app.textBoxes[3][1].isFilled():
         M = app.textBoxes[3][1].matrix()
-        # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]
         app.GEResultMatrix, app.GESteps = GEWithSteps(M)
         app.GEResult = OutputMatrix(app.GEResultMatrix, app.GEResultX0, app.GEResultY0, 
                 app.GEResultX1, app.GEResultY1, 'peach puff', 'tan4', app.GEScrEntryFontSize/2, app)
@@ -733,16 +727,6 @@ def SOLEMousePressed(app, event):
     if app.solveButton.mousePressed(app, event.x, event.y) \
     and app.textBoxes[4][1].isFilled():
         M = app.textBoxes[4][1].matrix()
-
-        # testing matrices below
-        # M = [[1, -5, 3], [7, 0, -9], [-1, 0, 3]]  # no solutions
-        # M = [[1, -5, 3, -4], [7, 0, -9, 3], [-1, 0, 3, -2]] # unique solution
-        # infinite solutions M below
-        # M = \
-        # [[3, 2, 3, 4, 2, 2, 7, 2],
-        # [1, 2, 7, 6, 4, 5, 2, 3],
-        # [4, 2, 2, 3, 2, 4, 6, 1],
-        # [4, 5, 6, 2, 3, 1, 4, 0]]
 
         # check if matrix has solutions based on result state
         app.SOLEResultState, app.SOLEResultMatrix, app.SOLESteps = SOLEWithSteps(M)
@@ -782,11 +766,6 @@ def detMousePressed(app, event):
     if app.solveButton.mousePressed(app, event.x, event.y)\
     and app.textBoxes[5][1].isFilled():
         M = app.textBoxes[5][1].matrix()
-        # M = [
-        #     [1, 2, 3], 
-        #     [2, 7, 8], 
-        #     [4, 3, 1]
-        #     ]
         app.detVal, app.detSteps = detCofacWithSteps(M)
         # displays input matrix in result screen
         app.detResult = OutputMatrix(M, app.detResultX0, app.detResultY0, 
@@ -806,24 +785,6 @@ def dirGraphMousePressed(app, event):
     if app.solveButton.mousePressed(app, event.x, event.y) \
     and app.textBoxes[6][1].isFilled():
         M = app.textBoxes[6][1].matrix()
-        # M = \
-        # [
-
-        # [0, 1, 1, 0, 0], 
-        # [0, 0, 1, 0, 1],
-        # [0, 0, 0, 1, 0],
-        # [0, 0, 0, 0, 1],
-        # [0, 0, 0, 0, 0]]
-
-            # [0, 1, 1, 1],
-            # [1, 0, 1, 1], 
-            # [1, 1, 0, 1],
-            # [1, 1, 1, 0]]
-
-            # [0, 1, 0, 1],
-            # [1, 0, 1, 0], 
-            # [0, 1, 0, 1],
-            # [1, 0, 1, 0]]
         app.nodesCoords = getNodesCoords(app.cx, app.cy, app.noderadialR, M)
         app.arrowsCoords = getArrowsCoords(M, app.nodesCoords)
         app.screen = 'dirGraphResult'
@@ -1145,13 +1106,14 @@ def redrawDirGraphResultScreen(app, canvas):
         else:
             theta = abs(math.atan((y0-y1)/(x1-x0)))
 
+        # for plotting arrows that touch node perimeter
         if x1 > x0:
             newX0 = x0 + app.nodeR*math.cos(theta)
             newX1 = x1 - app.nodeR*math.cos(theta)
         else: 
             newX0 = x0 - app.nodeR*math.cos(theta)
             newX1 = x1 + app.nodeR*math.cos(theta)
-        
+
         if y1 < y0:
                 newY0 = y0 - app.nodeR*math.sin(theta)
                 newY1 = y1 + app.nodeR*math.sin(theta)
@@ -1159,6 +1121,7 @@ def redrawDirGraphResultScreen(app, canvas):
             newY0 = y0 + app.nodeR*math.sin(theta)
             newY1 = y1 - app.nodeR*math.sin(theta)
 
+        # for horizontal arrows
         if x1 == x0:
             newX0, newX1 = x0, x1
             if y0 > y1:
@@ -1168,8 +1131,8 @@ def redrawDirGraphResultScreen(app, canvas):
                 newY0 = y0 + app.nodeR
                 newY1 = y1 - app.nodeR
 
-        elif y1 == y0:
-            newY0, newY1 = y0, y1
+        # for vertical arrows
+        elif y1 == y0: newY0, newY1 = y0, y1
         
         canvas.create_line(newX0, newY0, newX1, newY1,
                             width=3, fill='tan4', arrow=tk.LAST)

@@ -3,6 +3,7 @@ from matrix_GE import *
 from matrix_SOLE import *
 from cmu_112_graphics import *
 
+# class for all buttons
 class button:
     def __init__(self, x0, y0, width, height, color, text, fontSize, fontStyle, bracketColor):
         self.x0 = x0
@@ -35,6 +36,7 @@ class button:
         canvas.create_text(mean(self.x0, self.x1), mean(self.y0, self.y1), text=self.text, fill='linen', 
         font=f'Century {self.fontSize} {self.fontStyle}', justify=CENTER)
 
+# parent class for text boxes
 class TextBox:
     def __init__(self, x0, y0, width, height, color, outline, fontSize, app):
         self.x0 = x0
@@ -83,6 +85,7 @@ class TextBox:
         else: canvas.create_text(mean(self.x0, self.x1), mean(self.y0, self.y1), text=self.text, fill=f'{self.outline}', 
             font=f'Century {int(self.fontSize)}', justify=CENTER)
 
+# child class for text boxes for entering matrix dimensions
 class DimTextBox(TextBox):
     def __init__(self, x0, y0, width, height, color, outline, fontSize, app):
         super().__init__(x0, y0, width, height, color, outline, fontSize, app)
@@ -103,6 +106,7 @@ class DimTextBox(TextBox):
                 self.text = self.text[:-1]
                 return True
 
+# matrix entry text box class
 class MatrixEntry():
     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
         self.rows, self.cols = rows, cols
@@ -213,6 +217,7 @@ class MatrixEntry():
             for j in range(self.cols):
                 self.text[i][j] = ''
 
+# Output matrix class (for result screens)
 class OutputMatrix:
     def __init__(self, matrix, x0, y0, x1, y1, color, outline, fontSize, app):
         self.matrix = matrix    # input list
@@ -261,14 +266,7 @@ class OutputMatrix:
                 else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
                     font=f'Century {int(self.fontSize)}', justify=CENTER)
 
-
-class MatrixTextBox(TextBox):
-    def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, fontStyle, app):
-        super().__init__(x0, y0, color, outline, fontSize, fontStyle, app)
-        self.rows = rows
-        self.cols = cols
-
-# textbox for augmented matrix
+# child class for augmented matrix
 class AMEntryTextBox(MatrixEntry):
     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
         super().__init__(rows, cols, x0, y0, x1, y1, color, outline, fontSize, app)
@@ -278,7 +276,7 @@ class AMEntryTextBox(MatrixEntry):
         for i in range(self.rows):
             self.baseColors[i][-1] = self.constColColor
 
-# textbox for adjacency matrix
+# child class for adjacency matrix
 class AdjMatEntryTextBox(MatrixEntry):
     def __init__(self, rows, cols, x0, y0, x1, y1, color, outline, fontSize, app):
         super().__init__(rows, cols, x0, y0, x1, y1, color, outline, fontSize, app)
@@ -306,5 +304,3 @@ class AdjMatEntryTextBox(MatrixEntry):
                             self.color[i][j+app.entryNavKeys[eventKey]] = 'tan1'
                             self.isSelected[i][j+app.entryNavKeys[eventKey]] = True
                         count += 1
-
-# Create header class

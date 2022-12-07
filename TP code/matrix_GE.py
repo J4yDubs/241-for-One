@@ -1,7 +1,6 @@
-import math
-
 from matrix_utils import *
 
+# obtains index of pivot (leading non-zero entry in row)
 def pivotIndex(inputM, row):
     count = 0
     for elem in inputM[row]:
@@ -95,6 +94,7 @@ def GEWithSteps(inputM):
     steps.append(f'REF Matrix:\n{matToStr(roundOffEntries(inputM))}')
     return (roundOffEntries(inputM), concatSteps(steps))
 
+# obtains reduced row echelon form (RREF; leading entries reduced to 1)
 def RREF(inputM):
     refM = GE(inputM)
     rows = len(inputM)

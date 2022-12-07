@@ -1,14 +1,17 @@
-import math
+# General helper functions
 
 def mean(x,y):
     return (x+y)/2
 
+# creates 2D list of 0s
 def create2DList(rows, cols):
     return [([0]*cols) for row in range(rows)]
 
+# rounds off any value to 2 decimal places
 def roundOff(entry):
     return float("%.2f" % entry)
 
+# rounds off every entry in a matrix to 2 decimal places
 def roundOffEntries(M):
     # if 2D
     if isinstance(M[0], list):
@@ -37,12 +40,14 @@ def concatSteps(steps):
         stepsConcat += step + '\n\n'
     return stepsConcat
 
+# Exchanges two specified rows in an input matrix
 def rowExchange(inputM, R1, R2):
     temp = inputM[R2]
     inputM[R2] = inputM[R1]
     inputM[R1] = temp
     return inputM
 
+# matrix addition function
 def matAdd(M1, M2):
     rows, cols = len(M1), len(M1[0])
     if rows != len(M2) or cols != len(M2[0]):
@@ -54,6 +59,7 @@ def matAdd(M1, M2):
             sum[row][col] = M1[row][col] + M2[row][col]
     return sum
 
+# helper function for matrix multiplication
 def matMulHelper(M1, M2, row, col):
     cols = len(M1[0])
     entry = 0
@@ -61,6 +67,7 @@ def matMulHelper(M1, M2, row, col):
         entry += M1[row][k] * M2[k][col]
     return entry
 
+# main matrix multiplication function
 def matMul(M1, M2):
     rows1, cols1 = len(M1), len(M1[0])
     rows2, cols2 = len(M2), len(M2[0])
@@ -74,6 +81,7 @@ def matMul(M1, M2):
     
     return roundOffEntries(prodM)
 
+# helper function for matrix multiplication (with steps displayed)
 def matMulWithStepsHelper(M1, M2, row, col):
     cols = len(M1[0])
     entry = 0
@@ -83,6 +91,7 @@ def matMulWithStepsHelper(M1, M2, row, col):
         products.append((M1[row][k], M2[k][col]))
     return (entry, products)
 
+# main matrix multiplication function (with steps displayed)
 def matMulWithSteps(M1, M2):
     rows1, cols1 = len(M1), len(M1[0])
     rows2, cols2 = len(M2), len(M2[0])
@@ -106,6 +115,7 @@ def matMulWithSteps(M1, M2):
     steps.append(f'Matrix Product:\n{matToStr(roundOffEntries(prodM))}')
     return roundOffEntries(prodM), steps
 
+# matrix transpose function
 def matTpose(inputM):
     rows = len(inputM)
     cols =  len(inputM[0])
