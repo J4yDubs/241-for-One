@@ -218,6 +218,9 @@ def mulScreenInit(app):
         app.mulScrEntryTBX1 + app.width/2, app.mulScrEntryTBY1, 
         'peach puff', 'tan4', app.mulScrEntry2FontSize, app))
 
+    # dimension check mode (to redraw error message)
+    app.mulDimError = None
+
     # *** MULTIPLICATION RESULT SCREEN ***
     app.mulResultX0 = app.width/3
     app.mulResultY0 = app.height/5
@@ -448,17 +451,20 @@ def dirGraphScreenInit(app):
     app.nodeR = app.height/20   # node radius
     app.nodesCoords = None
     app.arrowsCoords = None
-    # app.detResultX0 = app.width/2.85
-    # app.detResultY0 = app.height/5
-    # app.detResultX1 = app.width - app.detResultX0
-    # app.detResultY1 = app.detResultY0 + (app.detResultX1 - app.detResultX0)
-    # app.detResultMatrix = create2DList(app.detScrEntryTBRows, app.detScrEntryTBCols)
-    # app.detResult = OutputMatrix(app.detResultMatrix, app.detResultX0, app.detResultY0, 
-    # app.detResultX1, app.detResultY1, 'peach puff', 'tan4', app.detScrEntryFontSize, app)
-    # app.detValue = None
 
 # *****************************************************************
-# ********************* KEYPRESSED FUNCTIONS **********************
+# ********************* TIMER FIRED FUNCTIONS **********************
+# *****************************************************************
+
+# periodically checks if there is a dimension mismatch for matrix multiplication
+def mulScreenTimerFired(app):
+    if app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text:  # Dim error message display
+        app.mulDimError = False
+    else: app.mulDimError = True
+    
+
+# *****************************************************************
+# ********************* KEY PRESSED FUNCTIONS **********************
 # *****************************************************************
 
 # Addition screen keyPressed function
@@ -501,6 +507,10 @@ def matMulKeyPressed(app, event):
                 app.mulScrEntryTBX0, app.mulScrEntryTBY0, 
                 app.mulScrEntryTBX1, app.mulScrEntryTBY1, 
                 'peach puff', 'tan4', app.mulScrEntry1FontSize, app)
+            # if app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text:  # Dim error message display
+            #     app.mulDimError = False
+            # else: app.mulDimError = True
+
     for i in range(len(app.textBoxes[1][1])):
         if app.textBoxes[1][1][i].keyPressed(app, event.key):
             if app.textBoxes[1][1][0].text != '':
@@ -621,7 +631,7 @@ def scrollKeyPressed(app, event):
 # *****************************************************************
 
 # *****************************************************************
-# ********************* MOUSEPRESSED FUNCTIONS ********************
+# ********************* MOUSE PRESSED FUNCTIONS ********************
 # *****************************************************************
 
 # Matrix addition mousePressed
@@ -661,8 +671,8 @@ def matMulMousePressed(app, event):
 
     # Solving here
     if app.solveButton.mousePressed(app, event.x, event.y)\
-        and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
-        and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
+    and app.textBoxes[1][2].isFilled() and app.textBoxes[1][3].isFilled() \
+    and app.textBoxes[1][0][1].text == app.textBoxes[1][1][0].text: # dim check
         M1, M2 = app.textBoxes[1][2].matrix(), app.textBoxes[1][3].matrix()
         # M1, M2 = [[1, 7, 4, 2], [2, 3, 3, 3], [2, 8, 5, 3]], [[1, 3, 0], [4, 2, 1], [3, 7, 5], [2, 4, 4]]
         app.mulResultMatrix, app.mulSteps = matMulWithSteps(M1, M2)
@@ -938,7 +948,7 @@ def redrawMatMulScreen(app, canvas):
     canvas.create_text(app.width/2, 0.05*app.height, text="Matrix Multiplication",
     fill='tan4', font=f'Century {app.mulScrTitleSize} bold', justify=CENTER)
 
-    for i in range(len(app.textBoxes[0][0])):
+    for i in range(len(app.textBoxes[1][0])):
         app.textBoxes[1][0][i].redraw(app, canvas)
         app.textBoxes[1][1][i].redraw(app, canvas)
         canvas.create_text(int(app.matMulMargin/2 + app.mulScrDimTBWidth/2 + i*app.width/2),
@@ -951,6 +961,10 @@ def redrawMatMulScreen(app, canvas):
 
     canvas.create_text(app.width/2, app.height/2, text="×",
     fill='tan4', font=f'Century {app.addScrTitleSize*3} bold', justify=CENTER)
+
+    if app.mulDimError:
+        canvas.create_text(app.width/2, 0.18*app.height, text='Matrix dimension\nmismatch',
+        fill='red', font=f'Century {int(app.addScrTitleSize/1.7)}', justify=CENTER)
 
 def redrawMatMulResultScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -970,7 +984,7 @@ def redrawMatMulStepsScreen(app, canvas):
         canvas.create_text(app.width/2, 0.3*app.height + i*0.15*app.height + app.scrollY, text=f'{app.mulSteps[i]}',
     fill='tan4', font=f'Century {int(app.mulScrTitleSize/2)}', justify=CENTER)
     canvas.create_text(app.width/2, 0.3*app.height + (i+1)*0.15*app.height + app.scrollY, text=f'{app.mulSteps[-1]}',
-    fill='tan4', font=f'Century {int(app.mulScrTitleSize/2)} bold', justify=CENTER)
+    fill='tan4', font=f'Century {int(app.mulScrTitleSize/2)} bold', justify=CENTER, anchor=tk.N)
 
 def redrawMatTposeScreen(app, canvas):
     drawBackHomeButton(app, canvas)
@@ -1107,7 +1121,7 @@ def redrawDirGraphScreen(app, canvas):
     drawBackHomeButton(app, canvas)
     drawSolveButton(app, canvas)
     drawClearButton(app, canvas)
-    canvas.create_text(app.width/2, 0.07*app.height, text="Generate Directed Graph",
+    canvas.create_text(app.width/2, 0.07*app.height, text="Generate Directed Graph\nfrom Adjacency Matrix",
     fill='tan4', font=f'Century {app.dirGraphScrTitleSize} bold', justify=CENTER)
     app.textBoxes[6][0][0].redraw(app, canvas)
     canvas.create_text(app.width/2, 0.25*app.height, text='rows and cols each', fill='tan4', 

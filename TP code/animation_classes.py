@@ -96,8 +96,9 @@ class DimTextBox(TextBox):
                     self.text += eventKey
                     return True
             elif eventKey in app.numKeys:
-                self.text += eventKey
-                return True
+                if len(self.text) == 0 or (self.text == '1' and eventKey == '0'):   # ensures max allowable dim is 10
+                    self.text += eventKey
+                    return True
             elif eventKey == 'Backspace' or eventKey == 'Delete':
                 self.text = self.text[:-1]
                 return True
@@ -177,10 +178,18 @@ class MatrixEntry():
                     entryY1 = entryY0 + self.height
                     canvas.create_rectangle(entryX0, entryY0, entryX1, entryY1, fill=self.color[i][j], outline=self.outline)
                     if self.isSelected[i][j]:
-                        canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill='linen', 
-                        font=f'Century {int(self.fontSize)}', justify=CENTER)
-                    else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
-                        font=f'Century {int(self.fontSize)}', justify=CENTER)
+                        if len(self.text[i][j])>1:
+                            canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill='linen', 
+                            font=f'Century {int(self.fontSize/(0.55*len(self.text[i][j])))}', justify=CENTER)
+                        else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill='linen', 
+                            font=f'Century {int(self.fontSize/(0.55*2))}', justify=CENTER)
+                    else:
+                        if len(self.text[i][j])>1: 
+                            canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
+                            font=f'Century {int(self.fontSize/(0.55*len(self.text[i][j])))}', justify=CENTER)
+                        else: canvas.create_text(mean(entryX0, entryX1), mean(entryY0, entryY1), text=self.text[i][j], fill=f'{self.outline}', 
+                            font=f'Century {int(self.fontSize/(0.55*2))}', justify=CENTER)
+
     
     def isFilled(self):
         for i in range(self.rows):

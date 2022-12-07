@@ -42,6 +42,9 @@ def appStarted(app):
     detScreenInit(app)
     dirGraphScreenInit(app)
 
+def timerFired(app):
+    mulScreenTimerFired(app)
+
 def keyPressed(app, event):
     if app.screen == 'matAdd':
         matAddKeyPressed(app, event)
