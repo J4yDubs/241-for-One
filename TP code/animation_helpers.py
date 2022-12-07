@@ -640,10 +640,8 @@ def matAddMousePressed(app, event):
     # Solving here
     if app.solveButton.mousePressed(app, event.x, event.y) and \
         app.textBoxes[0][1].isFilled() and app.textBoxes[0][2].isFilled():
-        app.addResultMatrix = create2DList(app.addScrEntryTBRows, app.addScrEntryTBCols)  # clears result list
-        for i in range(app.addScrEntryTBRows):
-            for j in range(app.addScrEntryTBCols):
-                app.addResultMatrix[i][j] += float(app.textBoxes[0][1].text[i][j]) + float(app.textBoxes[0][2].text[i][j])
+        M1, M2 = app.textBoxes[0][1].matrix(), app.textBoxes[0][2].matrix()
+        app.addResultMatrix = matAdd(M1, M2)
         app.addResult = OutputMatrix(app.addResultMatrix, app.addResultX0, app.addResultY0, 
                 app.addResultX1, app.addResultY1, 'peach puff', 'tan4', app.addScrEntryFontSize/2, app)
         app.screen = 'matAddResult'
