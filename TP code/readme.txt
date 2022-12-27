@@ -6,7 +6,16 @@
 1. PROJECT DESCRIPTION 
 **************************************************
 
-241-for-One is an educational tool for students taking CMU's 21-241, Matrices and Linear Transformations. The program aims to demonstrate concepts specific to that class and offer step-by-step instructions for operations such as matrix multiplication, Gaussian Elimination, and calculating determinants. The user interface is similar to that of online matrix calculators where the user 1) sets the input dimensions of the matrix (or matrices), 2) keys in the entries, and 3) solves with the desired function.
+241-for-One is an educational tool for students taking CMU's 21-241, Matrices and Linear Transformations. The program aims to demonstrate concepts specific to that class and offer step-by-step instructions for various mathematical operations. The user interface is similar to that of online matrix calculators where the user 1) sets the input dimensions of the matrix (or matrices), 2) keys in the entries, and 3) solves with the desired function.
+
+The mathematical functions that have been developed are:
+- Matrix addition
+- Matrix multiplication
+- Obtain transposes
+- Gaussian Elimination
+- Solving systems of linear equations
+- Obtaining determinants (via the cofactor method)
+- Generating directed graphs from adjacency matrices
 
 
 **************************************************
