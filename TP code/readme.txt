@@ -11,7 +11,7 @@
 The mathematical functions that have been developed are:
 - Matrix addition
 - Matrix multiplication
-- Obtain transposes
+- Obtaining transposes
 - Gaussian Elimination
 - Solving systems of linear equations
 - Obtaining determinants (via the cofactor method)
